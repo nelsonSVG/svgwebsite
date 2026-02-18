@@ -1,6 +1,7 @@
+'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { chatWithAssistant } from '../services/geminiService';
+import { chatWithAssistant } from '@/lib/geminiService';
 
 interface AssistantProps {
   isOpen: boolean;

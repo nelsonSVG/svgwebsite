@@ -1,6 +1,7 @@
+'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Project } from '../types';
+import { Project } from '@/lib/types';
 
 interface ProjectDetailProps {
   project: Project;

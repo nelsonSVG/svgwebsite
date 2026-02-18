@@ -1,6 +1,3 @@
-
-import React from 'react';
-
 export enum ProjectCategory {
   ALL = 'all',
   WEB = 'web',
@@ -25,7 +22,7 @@ export interface Service {
   id: string;
   title: string;
   description: string;
-  iconName: string; // Changed from React.ReactNode to string for CMS compatibility
+  iconName: string;
 }
 
 export interface Testimonial {

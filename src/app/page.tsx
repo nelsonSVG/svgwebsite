@@ -1,14 +1,13 @@
+'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ProjectCategory, Project, Service, Testimonial } from './types';
-import { PROJECTS, SERVICES, TESTIMONIALS } from './constants';
-import ProjectDetail from './components/ProjectDetail';
-import Assistant from './components/Assistant';
+import { ProjectCategory, Project, Service, Testimonial } from '@/lib/types';
+import { PROJECTS, SERVICES, TESTIMONIALS } from '@/lib/constants';
+import ProjectDetail from '@/components/ProjectDetail';
+import Assistant from '@/components/Assistant';
 
 // --- CONFIGURATION ---
-// PASTE YOUR INSTAGRAM ACCESS TOKEN HERE INSIDE THE QUOTES
-// Get it from: developers.facebook.com > My Apps > Instagram Basic Display > User Token Generator
-const INSTAGRAM_TOKEN = ""; // e.g., "IGQJHO..."
+const INSTAGRAM_TOKEN = "";
 
 interface NavLinkProps {
   href: string;
@@ -105,7 +104,7 @@ interface InstagramPost {
   media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
 }
 
-const App: React.FC = () => {
+export default function Home() {
   const [activeCategory, setActiveCategory] = useState<ProjectCategory>(ProjectCategory.ALL);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -187,7 +186,6 @@ const App: React.FC = () => {
   const avatarUrl = "https://picsum.photos/seed/nelsonface/200/200";
 
   // Prepare feed for marquee (double it for smooth loop)
-  // Ensure we have enough items to scroll smoothly
   const marqueeFeed = instagramFeed.length > 0 ? [...instagramFeed, ...instagramFeed] : [];
 
   return (
@@ -230,7 +228,7 @@ const App: React.FC = () => {
               onClick={() => setIsAssistantOpen(true)}
               className="bg-white text-black px-7 py-2.5 rounded-full text-sm font-bold hover:bg-[#e0e0e0] transition-colors transform hover:-translate-y-0.5"
             >
-              Let's Talk
+              Let&apos;s Talk
             </button>
           </div>
           
@@ -255,7 +253,7 @@ const App: React.FC = () => {
           onClick={() => { setIsAssistantOpen(true); setIsMobileMenuOpen(false); }}
           className="mt-8 bg-white text-black px-10 py-4 rounded-full font-bold text-xl"
         >
-          Let's Talk
+          Let&apos;s Talk
         </button>
       </div>
 
@@ -314,7 +312,6 @@ const App: React.FC = () => {
                 style={{ transitionDelay: `${index * 50}ms` }}
               >
                 <div className="w-14 h-14 bg-[#222] group-hover:bg-white group-hover:text-black rounded-2xl flex items-center justify-center mb-8 transition-colors duration-500">
-                  {/* Map the string ID from CMS to actual SVG component */}
                   {ICON_MAP[service.iconName] || ICON_MAP['default']}
                 </div>
                 <h3 className="font-syne text-2xl font-bold mb-4">{service.title}</h3>
@@ -469,7 +466,7 @@ const App: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonialsData.map((t) => (
               <div key={t.id} className="bg-[#161616] p-10 rounded-[2rem] border border-white/5 relative">
-                <div className="text-3xl text-white/20 font-serif absolute top-8 left-8">"</div>
+                <div className="text-3xl text-white/20 font-serif absolute top-8 left-8">&ldquo;</div>
                 <p className="text-[#ccc] text-lg italic mb-10 mt-6 leading-relaxed relative z-10">{t.quote}</p>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center font-syne font-bold text-black text-sm">
@@ -507,7 +504,7 @@ const App: React.FC = () => {
               <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-6 block">Meet the Founder</span>
               <h2 className="font-syne text-5xl md:text-7xl font-bold mb-10 leading-none">Building digital <br/>excellence since 2016.</h2>
               <p className="text-[#888] text-lg mb-8 leading-relaxed">
-                I am Nelson SVG, and SVG Visual is my creative boutique studio. I believe that high-end design isn't just about aesthetics—it's about creating deep connections between brands and their audience.
+                I am Nelson SVG, and SVG Visual is my creative boutique studio. I believe that high-end design isn&apos;t just about aesthetics—it&apos;s about creating deep connections between brands and their audience.
               </p>
               <p className="text-[#888] text-lg mb-12 leading-relaxed">
                 Our collaborative approach ensures that every project is unique and performance-driven, transforming vision into high-impact digital reality.
@@ -543,10 +540,10 @@ const App: React.FC = () => {
         <div className="w-full px-6 md:px-12 lg:px-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
             <div>
-              <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-4 block">Let's Connect</span>
+              <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-4 block">Let&apos;s Connect</span>
               <h2 className="font-syne text-5xl md:text-7xl font-bold mb-10 leading-[0.9]">Start your next chapter.</h2>
               <p className="text-[#888] text-xl mb-12 max-w-md">
-                Have a project in mind? We'd love to hear your vision. Let's make it a digital reality.
+                Have a project in mind? We&apos;d love to hear your vision. Let&apos;s make it a digital reality.
               </p>
               
               <div className="space-y-10">
@@ -589,7 +586,7 @@ const App: React.FC = () => {
                     </svg>
                   </div>
                   <h3 className="font-syne text-4xl font-bold mb-4">Inquiry Received.</h3>
-                  <p className="text-[#888] text-lg">We'll review your project and get back to you within 24 hours.</p>
+                  <p className="text-[#888] text-lg">We&apos;ll review your project and get back to you within 24 hours.</p>
                 </div>
               ) : (
                 <form onSubmit={handleFormSubmit} className="space-y-8 relative z-10">
@@ -686,6 +683,4 @@ const App: React.FC = () => {
       )}
     </div>
   );
-};
-
-export default App;
+}

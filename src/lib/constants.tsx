@@ -1,4 +1,3 @@
-
 import { Project, ProjectCategory, Service, Testimonial } from './types';
 
 // THIS FILE SIMULATES YOUR CMS DATABASE (e.g., Keystatic Content)
@@ -132,7 +131,7 @@ export const SERVICES: Service[] = [
     id: 'web',
     title: 'Web Design',
     description: 'Immersive, high-performance websites that blend stunning aesthetics with seamless functionality to tell your brand story.',
-    iconName: 'layout' // Maps to SVG in App.tsx
+    iconName: 'layout'
   },
   {
     id: 'branding',
