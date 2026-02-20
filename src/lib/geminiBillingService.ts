@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI("AIzaSyBfmXmfdvfxFEc-l2K781pDe8huo5UAuKA");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyBfmXmfdvfxFEc-l2K781pDe8huo5UAuKA");
 
 export async function generateGeminiInvoiceItems(prompt: string) {
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
