@@ -158,10 +158,28 @@ export const InvoicePDF = ({ invoice, client, items }: { invoice: Invoice, clien
         </View>
       </View>
 
+      <View style={[styles.section, { marginTop: 20 }]}>
+        <Text style={styles.sectionTitle}>TAX & LEGAL NOTE</Text>
+        <Text style={{ color: '#666', fontSize: 9 }}>
+          Services were provided remotely from Colombia by an independent contractor. No U.S. sales tax applies.
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>PAYMENT METHOD: ACH TRANSFER ONLY</Text>
+        <View style={{ color: '#666', lineHeight: 1.5, fontSize: 9 }}>
+          <Text>This account accepts ACH transfers exclusively.</Text>
+          <Text>Beneficiary name: Nelson Casallas</Text>
+          <Text>Bank name: Lead Bank</Text>
+          <Text>Account number: 213031980680 | Routing number: 101019644</Text>
+          <Text>Account type: checking</Text>
+          <Text>Recipient Address: Calle 19A 82-65, Bogotá D.C., Colombia</Text>
+          <Text>Bank address: 1801 Main St, Kansas City, Missouri 64108</Text>
+        </View>
+      </View>
+
       <View style={styles.footer}>
-        <Text>Thank you for your business!</Text>
-        <Text>Payment terms: 15 days from issue date.</Text>
-        <Text>Bank Transfer: [Your Bank Info Here] | Card payment via Epayco/Stripe</Text>
+        <Text>Thank you for your business! SVG Visual Digital Design Agency.</Text>
       </View>
     </Page>
   </Document>
