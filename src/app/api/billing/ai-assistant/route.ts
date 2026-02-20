@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { generateDeepSeekResponse } from '@/lib/deepseekService';
+import { generateGeminiInvoiceItems } from '@/lib/geminiBillingService';
 
 export async function POST(req: Request) {
   try {
@@ -8,10 +8,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    const items = await generateDeepSeekResponse(prompt);
+    const items = await generateGeminiInvoiceItems(prompt);
     return NextResponse.json({ items });
   } catch (error: any) {
-    console.error('DeepSeek AI Error:', error);
+    console.error('Gemini AI Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
