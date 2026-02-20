@@ -23,22 +23,39 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        router.push('/admin/login');
-      } else {
-        setSession(session);
-      }
+    // Si estamos en la página de login, no forzamos redirección ni validación aquí
+    if (pathname === '/admin/login') {
       setLoading(false);
-    });
+      return;
+    }
+
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          router.push('/admin/login');
+        } else {
+          setSession(session);
+        }
+      } catch (err) {
+        console.error('Auth check error:', err);
+        router.push('/admin/login');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      if (!session) router.push('/admin/login');
+      if (!session && pathname !== '/admin/login') {
+        router.push('/admin/login');
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, [router]);
+  }, [router, pathname]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -59,6 +76,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-white"></div>
       </div>
     );
+  }
+
+  // Permitir renderizar la página de login sin sesión
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
   }
 
   if (!session) return null;
