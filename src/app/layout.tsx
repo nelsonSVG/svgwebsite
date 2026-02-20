@@ -55,20 +55,11 @@ export const metadata: Metadata = {
     siteName: 'SVG Visual',
     title: 'SVG Visual | High-End Digital Design Agency',
     description: 'Boutique studio crafting premium digital experiences, web design, and strategic branding.',
-    images: [
-      {
-        url: 'https://picsum.photos/seed/svg_og/1200/630', // Placeholder, ideally a real OG image later
-        width: 1200,
-        height: 630,
-        alt: 'SVG Visual Digital Agency',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SVG Visual | Digital Design Excellence',
     description: 'We craft digital experiences that matter. Web design, branding, and UX for ambitious brands.',
-    images: ['https://picsum.photos/seed/svg_twitter/1200/630'], // Placeholder
     creator: '@svgvisual',
   },
   robots: {
