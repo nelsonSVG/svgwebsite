@@ -1,6 +1,7 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Syne, Poppins } from 'next/font/google'
 import './globals.css'
+import { LanguageProvider } from "@/lib/LanguageContext";
 
 const syne = Syne({
   subsets: ['latin'],
@@ -16,9 +17,71 @@ const poppins = Poppins({
   display: 'swap',
 })
 
+export const viewport: Viewport = {
+  themeColor: '#0a0a0a',
+  width: 'device-width',
+  initialScale: 1,
+}
+
 export const metadata: Metadata = {
-  title: 'SVG Visual - Digital Design Agency',
-  description: 'A high-end digital design agency portfolio featuring web design, branding, and mobile app development services with a sleek dark aesthetic.',
+  title: {
+    default: 'SVG Visual | High-End Digital Design Agency',
+    template: '%s | SVG Visual'
+  },
+  description: 'SVG Visual is a boutique digital studio specializing in premium web design, strategic branding, and high-impact user experiences. We craft digital excellence that propels brands into the future through innovation and AI-driven solutions.',
+  keywords: [
+    'Digital Design Agency', 
+    'Boutique Studio', 
+    'Web Design', 
+    'Branding Strategy', 
+    'UI/UX Design', 
+    'Premium Digital Experiences', 
+    'AI Automation for Brands', 
+    'Nelson SVG',
+    'High-End Web Development'
+  ],
+  authors: [{ name: 'Nelson SVG' }],
+  creator: 'Nelson SVG',
+  publisher: 'SVG Visual',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://svgvisual.com',
+    siteName: 'SVG Visual',
+    title: 'SVG Visual | High-End Digital Design Agency',
+    description: 'Boutique studio crafting premium digital experiences, web design, and strategic branding.',
+    images: [
+      {
+        url: 'https://picsum.photos/seed/svg_og/1200/630', // Placeholder, ideally a real OG image later
+        width: 1200,
+        height: 630,
+        alt: 'SVG Visual Digital Agency',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SVG Visual | Digital Design Excellence',
+    description: 'We craft digital experiences that matter. Web design, branding, and UX for ambitious brands.',
+    images: ['https://picsum.photos/seed/svg_twitter/1200/630'], // Placeholder
+    creator: '@svgvisual',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 }
 
 export default function RootLayout({
@@ -28,8 +91,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`h-full scroll-smooth ${syne.variable} ${poppins.variable}`}>
-      <body className="h-full bg-[#0a0a0a]">
-        {children}
+      <body className="h-full bg-[#0a0a0a] text-white selection:bg-white selection:text-black antialiased">
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   )

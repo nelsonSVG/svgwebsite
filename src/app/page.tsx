@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { ProjectCategory, Project, Service, Testimonial } from '@/lib/types';
+import { SERVICES } from '@/lib/constants';
 import { supabase } from '@/lib/supabaseClient';
 import ProjectDetail from '@/components/ProjectDetail';
+import { useLanguage } from '@/lib/LanguageContext';
 import Assistant from '@/components/Assistant';
 
 // --- CONFIGURATION ---
@@ -105,6 +107,7 @@ interface InstagramPost {
 }
 
 export default function Home() {
+  const { t, language, setLanguage } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<ProjectCategory>(ProjectCategory.ALL);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -120,6 +123,9 @@ export default function Home() {
   useEffect(() => {
     // Load CMS Data from Supabase
     const fetchCmsData = async () => {
+      // Set default local services as fallback
+      setServicesData(SERVICES);
+
       const [projectsRes, testimonialsRes, servicesRes] = await Promise.all([
         supabase.from('projects').select('*').order('created_at', { ascending: false }),
         supabase.from('testimonials').select('*').order('created_at', { ascending: false }),
@@ -226,14 +232,30 @@ export default function Home() {
             <span className="hidden sm:inline font-syne text-xl font-bold tracking-tight">SVG Visual</span>
           </a>
           
-          <nav className="hidden md:flex items-center gap-10">
-            <NavLink href="#services">Services</NavLink>
-            <NavLink href="#projects">Projects</NavLink>
-            <NavLink href="#about">About</NavLink>
-            <NavLink href="#contact">Contact</NavLink>
+          <nav className="hidden md:flex items-center gap-8">
+            <NavLink href="#services">{t('nav.services')}</NavLink>
+            <NavLink href="#projects">{t('nav.projects')}</NavLink>
+            <NavLink href="#about">{t('nav.about')}</NavLink>
+            <NavLink href="#contact">{t('nav.contact')}</NavLink>
           </nav>
           
           <div className="hidden md:flex items-center gap-5">
+            {/* Language Switcher */}
+            <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-1 mr-2">
+              <button 
+                onClick={() => setLanguage('en')}
+                className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all ${language === 'en' ? 'bg-white text-black' : 'text-zinc-500 hover:text-white'}`}
+              >
+                EN
+              </button>
+              <button 
+                onClick={() => setLanguage('es')}
+                className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all ${language === 'es' ? 'bg-white text-black' : 'text-zinc-500 hover:text-white'}`}
+              >
+                ES
+              </button>
+            </div>
+
             <a 
               href="https://www.instagram.com/svg.visual/" 
               target="_blank"
@@ -250,7 +272,7 @@ export default function Home() {
               onClick={() => setIsAssistantOpen(true)}
               className="bg-white text-black px-7 py-2.5 rounded-full text-sm font-bold hover:bg-[#e0e0e0] transition-colors transform hover:-translate-y-0.5"
             >
-              Let&apos;s Talk
+              {t('nav.talk')}
             </button>
           </div>
           
@@ -285,12 +307,17 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/[0.03] rounded-full blur-3xl pointer-events-none"></div>
         
         <div className="max-w-6xl mx-auto text-center z-10">
-          <span className="inline-block text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">Digital Design Agency</span>
+          <span className="inline-block text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">{t('hero.agency')}</span>
           <h1 className="font-syne text-5xl md:text-7xl lg:text-9xl font-bold leading-[1.05] mb-12 tracking-tight animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
-            We craft digital <br className="hidden md:block"/> experiences that matter.
+            {t('hero.title').split('<br/>').map((line, i) => (
+              <React.Fragment key={i}>
+                {line}
+                {i === 0 && <br className="hidden md:block"/>}
+              </React.Fragment>
+            ))}
           </h1>
-          <p className="text-[#888] text-lg md:text-xl max-w-2xl mx-auto mb-14 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
-            SVG Visual is a boutique studio specializing in web design, branding, and user experiences that propel your brand into the future.
+          <p className="text-[#888] text-lg md:text-xl max-w-4xl mx-auto mb-14 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+            {t('hero.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500">
             <a 
@@ -301,13 +328,13 @@ export default function Home() {
               }}
               className="w-full sm:w-auto bg-white text-black px-12 py-5 rounded-full font-bold text-lg hover:scale-105 transition-transform duration-300"
             >
-              Explore Work
+              {t('hero.explore')}
             </a>
             <button 
               onClick={() => setIsAssistantOpen(true)}
               className="w-full sm:w-auto border border-white/20 text-white px-12 py-5 rounded-full font-bold text-lg hover:bg-white hover:text-black hover:border-white transition-all duration-300"
             >
-              Start Project
+              {t('hero.start')}
             </button>
           </div>
         </div>
@@ -318,11 +345,11 @@ export default function Home() {
         <div className="w-full px-6 md:px-12 lg:px-20">
           <div className="mb-24 md:flex md:items-end md:justify-between">
             <div>
-              <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-4 block">Our Expertise</span>
-              <h2 className="font-syne text-4xl md:text-6xl font-bold">What We Do</h2>
+              <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-4 block">{t('services.subtitle')}</span>
+              <h2 className="font-syne text-4xl md:text-6xl font-bold">{t('services.title')}</h2>
             </div>
             <p className="text-[#666] max-w-sm mt-6 md:mt-0 text-right hidden md:block">
-              Comprehensive design solutions tailored for ambitious brands.
+              {t('services.description')}
             </p>
           </div>
           
@@ -348,8 +375,8 @@ export default function Home() {
       <section id="projects" className="py-32">
         <div className="w-full px-6 md:px-12 lg:px-20">
           <div className="flex flex-col items-center mb-20">
-            <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-4 block">Portfolio</span>
-            <h2 className="font-syne text-4xl md:text-6xl font-bold mb-12">Selected Works</h2>
+            <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-4 block">{t('projects.subtitle')}</span>
+            <h2 className="font-syne text-4xl md:text-6xl font-bold mb-12">{t('projects.title')}</h2>
             
             <div className="flex flex-wrap justify-center gap-8">
               {Object.values(ProjectCategory).map((cat) => (
@@ -361,7 +388,7 @@ export default function Home() {
                     ${activeCategory === cat ? 'text-white' : 'text-[#444] hover:text-[#888]'}
                   `}
                 >
-                  {cat === ProjectCategory.ALL ? 'All Work' : cat.replace('uiux', 'UI/UX')}
+                  {cat === ProjectCategory.ALL ? t('projects.all') : cat.replace('uiux', 'UI/UX')}
                   <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-white transition-transform duration-300 origin-left ${activeCategory === cat ? 'scale-x-100' : 'scale-x-0'}`} />
                 </button>
               ))}
@@ -418,11 +445,11 @@ export default function Home() {
       <section className="py-24 border-t border-white/5 bg-[#0e0e0e] overflow-hidden relative group">
         <div className="w-full px-6 md:px-12 lg:px-20 mb-12 flex justify-between items-end">
            <div>
-             <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-4 block">Social Feed</span>
+             <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-4 block">{t('insta.subtitle')}</span>
              <h2 className="font-syne text-4xl font-bold">@svg.visual</h2>
            </div>
            <a href="https://www.instagram.com/svg.visual/" target="_blank" className="hidden sm:inline-block px-6 py-3 border border-white/20 rounded-full text-sm font-bold hover:bg-white hover:text-black transition-all">
-             Follow Us
+             {t('insta.follow')}
            </a>
         </div>
 
@@ -523,33 +550,33 @@ export default function Home() {
             </div>
             
             <div className="lg:pl-10">
-              <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-6 block">Meet the Founder</span>
-              <h2 className="font-syne text-5xl md:text-7xl font-bold mb-10 leading-none">Building digital <br/>excellence since 2016.</h2>
+              <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-6 block">{t('about.subtitle')}</span>
+              <h2 className="font-syne text-5xl md:text-7xl font-bold mb-10 leading-none">{t('about.title')}</h2>
               <p className="text-[#888] text-lg mb-8 leading-relaxed">
-                I am Nelson SVG, and SVG Visual is my creative boutique studio. I believe that high-end design isn&apos;t just about aesthetics—it&apos;s about creating deep connections between brands and their audience.
+                {t('about.p1')}
               </p>
               <p className="text-[#888] text-lg mb-12 leading-relaxed">
-                Our collaborative approach ensures that every project is unique and performance-driven, transforming vision into high-impact digital reality.
+                {t('about.p2')}
               </p>
               
               <div className="grid grid-cols-3 gap-8 border-t border-white/10 pt-10">
                 <div>
                   <p className="font-syne text-5xl font-bold mb-2 text-white">150+</p>
-                  <p className="text-[#555] text-xs font-bold uppercase tracking-widest">Projects</p>
+                  <p className="text-[#555] text-xs font-bold uppercase tracking-widest">{t('about.projects')}</p>
                 </div>
                 <div>
                   <p className="font-syne text-5xl font-bold mb-2 text-white">8+</p>
-                  <p className="text-[#555] text-xs font-bold uppercase tracking-widest">Years</p>
+                  <p className="text-[#555] text-xs font-bold uppercase tracking-widest">{t('about.years')}</p>
                 </div>
                 <div>
                   <p className="font-syne text-5xl font-bold mb-2 text-white">50+</p>
-                  <p className="text-[#555] text-xs font-bold uppercase tracking-widest">Clients</p>
+                  <p className="text-[#555] text-xs font-bold uppercase tracking-widest">{t('about.clients')}</p>
                 </div>
               </div>
               
               <div className="mt-12">
                  <a href="https://wa.me/573208647734" target="_blank" className="inline-flex items-center gap-3 text-white border-b border-white pb-1 hover:text-[#888] hover:border-[#888] transition-colors">
-                   Chat on WhatsApp <span className="text-xl">&rarr;</span>
+                   {t('about.whatsapp')} <span className="text-xl">&rarr;</span>
                  </a>
               </div>
             </div>
@@ -562,10 +589,10 @@ export default function Home() {
         <div className="w-full px-6 md:px-12 lg:px-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
             <div>
-              <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-4 block">Let&apos;s Connect</span>
-              <h2 className="font-syne text-5xl md:text-7xl font-bold mb-10 leading-[0.9]">Start your next chapter.</h2>
+              <span className="text-[#888] text-xs font-bold tracking-[0.3em] uppercase mb-4 block">{t('contact.subtitle')}</span>
+              <h2 className="font-syne text-5xl md:text-7xl font-bold mb-10 leading-[0.9]">{t('contact.title')}</h2>
               <p className="text-[#888] text-xl mb-12 max-w-md">
-                Have a project in mind? We&apos;d love to hear your vision. Let&apos;s make it a digital reality.
+                {t('contact.description')}
               </p>
               
               <div className="space-y-10">
@@ -577,7 +604,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-[#555] text-xs font-bold uppercase mb-1">Direct Line</p>
+                    <p className="text-[#555] text-xs font-bold uppercase mb-1">{t('contact.direct')}</p>
                     <a href="mailto:hi@svgvisual.com" className="text-2xl font-syne font-bold hover:text-[#888] transition-colors">hi@svgvisual.com</a>
                   </div>
                 </div>
@@ -589,7 +616,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-[#555] text-xs font-bold uppercase mb-1">WhatsApp</p>
+                    <p className="text-[#555] text-xs font-bold uppercase mb-1">{t('contact.whatsapp')}</p>
                     <a href="https://wa.me/573208647734" target="_blank" className="text-2xl font-syne font-bold hover:text-[#888] transition-colors">+57 320 864 7734</a>
                   </div>
                 </div>
@@ -607,31 +634,31 @@ export default function Home() {
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                   </div>
-                  <h3 className="font-syne text-4xl font-bold mb-4">Inquiry Received.</h3>
-                  <p className="text-[#888] text-lg">We&apos;ll review your project and get back to you within 24 hours.</p>
+                  <h3 className="font-syne text-4xl font-bold mb-4">{t('contact.form.success.title')}</h3>
+                  <p className="text-[#888] text-lg">{t('contact.form.success.message')}</p>
                 </div>
               ) : (
                 <form onSubmit={handleFormSubmit} className="space-y-8 relative z-10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div className="space-y-3">
-                      <label className="text-xs font-bold uppercase text-[#555] tracking-widest">Name</label>
-                      <input required type="text" className="w-full bg-transparent border-b border-[#333] py-4 text-lg focus:outline-none focus:border-white transition-colors" placeholder="Full name" />
+                      <label className="text-xs font-bold uppercase text-[#555] tracking-widest">{t('contact.form.name')}</label>
+                      <input required type="text" className="w-full bg-transparent border-b border-[#333] py-4 text-lg focus:outline-none focus:border-white transition-colors" placeholder={t('contact.form.name.placeholder')} />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-xs font-bold uppercase text-[#555] tracking-widest">Email</label>
-                      <input required type="email" className="w-full bg-transparent border-b border-[#333] py-4 text-lg focus:outline-none focus:border-white transition-colors" placeholder="email@address.com" />
+                      <label className="text-xs font-bold uppercase text-[#555] tracking-widest">{t('contact.form.email')}</label>
+                      <input required type="email" className="w-full bg-transparent border-b border-[#333] py-4 text-lg focus:outline-none focus:border-white transition-colors" placeholder={t('contact.form.email.placeholder')} />
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-xs font-bold uppercase text-[#555] tracking-widest">Interest</label>
-                    <input required type="text" className="w-full bg-transparent border-b border-[#333] py-4 text-lg focus:outline-none focus:border-white transition-colors" placeholder="Web Design, Branding, App..." />
+                    <label className="text-xs font-bold uppercase text-[#555] tracking-widest">{t('contact.form.interest')}</label>
+                    <input required type="text" className="w-full bg-transparent border-b border-[#333] py-4 text-lg focus:outline-none focus:border-white transition-colors" placeholder={t('contact.form.interest.placeholder')} />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-xs font-bold uppercase text-[#555] tracking-widest">Message</label>
-                    <textarea required rows={4} className="w-full bg-transparent border-b border-[#333] py-4 text-lg focus:outline-none focus:border-white transition-colors resize-none" placeholder="Tell us about your goals..."></textarea>
+                    <label className="text-xs font-bold uppercase text-[#555] tracking-widest">{t('contact.form.message')}</label>
+                    <textarea required rows={4} className="w-full bg-transparent border-b border-[#333] py-4 text-lg focus:outline-none focus:border-white transition-colors resize-none" placeholder={t('contact.form.message.placeholder')}></textarea>
                   </div>
                   <button className="w-full bg-white text-black py-5 rounded-full font-bold text-lg hover:bg-[#e0e0e0] transition-colors shadow-lg mt-4">
-                    Send Inquiry
+                    {t('contact.form.send')}
                   </button>
                 </form>
               )}
@@ -649,15 +676,15 @@ export default function Home() {
             </div>
             <div>
                <span className="font-syne text-2xl font-bold block leading-none">SVG Visual</span>
-               <span className="text-[#444] text-xs uppercase tracking-widest">Digital Design Agency</span>
+               <span className="text-[#444] text-xs uppercase tracking-widest">{t('footer.agency')}</span>
             </div>
           </div>
           
           <div className="flex flex-wrap justify-center gap-10">
-            <NavLink href="#services">Services</NavLink>
-            <NavLink href="#projects">Projects</NavLink>
-            <NavLink href="#about">About</NavLink>
-            <NavLink href="#contact">Contact</NavLink>
+            <NavLink href="#services">{t('nav.services')}</NavLink>
+            <NavLink href="#projects">{t('nav.projects')}</NavLink>
+            <NavLink href="#about">{t('nav.about')}</NavLink>
+            <NavLink href="#contact">{t('nav.contact')}</NavLink>
           </div>
 
           <div className="flex items-center gap-4">
@@ -676,7 +703,7 @@ export default function Home() {
           </div>
         </div>
         <div className="w-full px-6 md:px-12 lg:px-20 mt-20 pt-8 border-t border-white/5 text-center">
-          <p className="text-[#333] text-[10px] font-bold uppercase tracking-[0.5em]">© 2024 SVG Visual. Curated by Nelson SVG.</p>
+          <p className="text-[#333] text-[10px] font-bold uppercase tracking-[0.5em]">{t('footer.rights')}</p>
         </div>
       </footer>
 
@@ -684,7 +711,7 @@ export default function Home() {
       <a 
         href="https://wa.me/573208647734" 
         target="_blank"
-        className="fixed bottom-6 left-6 w-14 h-14 bg-[#25D366] rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-50 animate-bounce hover:animate-none"
+        className="fixed bottom-6 left-6 w-14 h-14 bg-[#25D366] rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-50"
       >
         <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path>

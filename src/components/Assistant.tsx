@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { chatWithAssistant } from '@/lib/geminiService';
+import { useLanguage } from '@/lib/LanguageContext';
 
 interface MessagePart {
   type: 'text' | 'link' | 'shortcut';
@@ -21,6 +22,7 @@ interface AssistantProps {
 }
 
 const Assistant: React.FC<AssistantProps> = ({ isOpen, setIsOpen }) => {
+  const { t } = useLanguage();
   const [leadId, setLeadId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -142,7 +144,7 @@ const Assistant: React.FC<AssistantProps> = ({ isOpen, setIsOpen }) => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 md:right-24 z-[70]">
+    <div className="fixed bottom-6 right-6 z-[70]">
       {isOpen && (
         <div className="absolute bottom-20 right-0 w-[calc(100vw-32px)] md:w-96 h-[500px] bg-[#161616] border border-[#222] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-300">
           <div className="p-5 bg-white text-black flex items-center justify-between">
@@ -252,9 +254,18 @@ const Assistant: React.FC<AssistantProps> = ({ isOpen, setIsOpen }) => {
         </div>
       )}
 
+      {!isOpen && (
+        <div className="absolute bottom-20 right-0 hidden md:block animate-in fade-in slide-in-from-right-4 duration-500">
+          <div className="bg-white text-black px-4 py-2 rounded-xl text-xs font-bold shadow-2xl relative whitespace-nowrap">
+            {t('assistant.invite')}
+            <div className="absolute -bottom-1 right-6 w-2 h-2 bg-white rotate-45"></div>
+          </div>
+        </div>
+      )}
+
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 bg-white text-black rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all z-50 group border-4 border-[#0a0a0a]"
+        className="w-14 h-14 bg-white text-black rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all group border-4 border-[#0a0a0a]"
       >
         {isOpen ? (
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

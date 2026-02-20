@@ -65,6 +65,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
     { name: 'Proyectos', icon: Briefcase, href: '/admin/projects' },
+    { name: 'Servicios', icon: Settings, href: '/admin/services' },
     { name: 'Testimonios', icon: MessageSquare, href: '/admin/testimonials' },
     { name: 'Leads', icon: Users, href: '/admin/leads' },
     { name: 'Ajustes', icon: Settings, href: '/admin/settings' },
