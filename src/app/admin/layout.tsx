@@ -91,7 +91,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   if (!session) return null;
 
   return (
-    <div className="min-h-screen bg-black text-white flex">
+    <div className="min-h-screen bg-black text-white flex font-poppins">
       {/* Sidebar Desktop */}
       <aside className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-zinc-950 border-r border-zinc-800 transition-transform duration-300 lg:relative lg:translate-x-0
@@ -99,7 +99,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       `}>
         <div className="flex flex-col h-full">
           <div className="p-6">
-            <h1 className="text-xl font-bold tracking-tighter">SVG ADMIN</h1>
+            <h1 className="text-xl font-bold tracking-tighter font-syne">SVG ADMIN</h1>
           </div>
 
           <nav className="flex-1 px-4 space-y-2">

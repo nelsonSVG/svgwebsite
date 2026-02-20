@@ -46,7 +46,7 @@ export default function InvoicesPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-white">Invoices</h1>
+        <h1 className="text-2xl font-bold text-white font-syne">Invoices</h1>
         <div className="flex gap-4">
           <Link
             href="/admin/billing/clients"
