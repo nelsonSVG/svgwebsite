@@ -7,7 +7,7 @@ import ProjectDetail from '@/components/ProjectDetail';
 import Assistant from '@/components/Assistant';
 
 // --- CONFIGURATION ---
-const INSTAGRAM_TOKEN = "";
+const INSTAGRAM_TOKEN = process.env.NEXT_PUBLIC_INSTAGRAM_TOKEN || "";
 
 interface NavLinkProps {
   href: string;
@@ -123,30 +123,24 @@ export default function Home() {
     setServicesData(SERVICES);
     setTestimonialsData(TESTIMONIALS);
 
-    // Fetch Instagram Data
+    // Fetch Instagram Data via our own API Proxy (which handles auto-refresh)
     const fetchInstagram = async () => {
-      if (!INSTAGRAM_TOKEN) {
-        // Fallback to placeholder images if no token
-        const placeholders = Array.from({ length: 8 }, (_, i) => ({
-          id: `demo-${i}`,
-          media_url: `https://picsum.photos/seed/insta${i + 10}/600/600`,
-          permalink: 'https://www.instagram.com/svg.visual/',
-          media_type: 'IMAGE' as const
-        }));
-        setInstagramFeed(placeholders);
-        return;
-      }
-
       try {
-        const response = await fetch(
-          `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink&limit=12&access_token=${INSTAGRAM_TOKEN}`
-        );
+        const response = await fetch('/api/instagram');
         const data = await response.json();
         
-        if (data && data.data) {
+        if (data && data.data && data.data.length > 0) {
           setInstagramFeed(data.data);
         } else {
-          console.error("Instagram API Error:", data);
+          // Fallback to placeholder images if API fails or no token
+          console.warn("Instagram API returned no data, using placeholders");
+          const placeholders = Array.from({ length: 8 }, (_, i) => ({
+            id: `demo-${i}`,
+            media_url: `https://picsum.photos/seed/insta${i + 10}/600/600`,
+            permalink: 'https://www.instagram.com/svg.visual/',
+            media_type: 'IMAGE' as const
+          }));
+          setInstagramFeed(placeholders);
         }
       } catch (error) {
         console.error("Failed to fetch Instagram feed", error);
