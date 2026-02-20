@@ -111,7 +111,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   key={item.name}
                   href={item.href}
                   className={`
-                    flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
+                    flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors font-syne font-bold
                     ${isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'}
                   `}
                 >
