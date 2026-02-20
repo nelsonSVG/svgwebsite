@@ -17,7 +17,7 @@ export default function Icon() {
       // ImageResponse JSX element
       <div
         style={{
-          fontSize: 24,
+          fontSize: 22,
           background: 'white',
           width: '100%',
           height: '100%',
@@ -25,9 +25,9 @@ export default function Icon() {
           alignItems: 'center',
           justifyContent: 'center',
           color: 'black',
-          borderRadius: '8px',
-          fontWeight: 'bold',
-          fontFamily: 'sans-serif',
+          borderRadius: '6px',
+          fontWeight: 800, // Syne boldest weight
+          fontFamily: 'Syne, sans-serif',
         }}
       >
         S
