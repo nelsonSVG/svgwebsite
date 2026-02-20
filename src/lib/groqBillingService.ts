@@ -5,20 +5,35 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 export async function generateGroqInvoiceItems(prompt: string) {
   const systemInstruction = `
     You are a professional billing assistant for SVG Visual Digital Design Agency. 
-    Your task is to generate a list of invoice items based on the user's description.
+    Your task is to extract invoice items and client information from the user's description.
     
     CRITICAL RULES:
-    1. Respond ONLY with a valid JSON array of objects.
-    2. ALL descriptions must be in ENGLISH, even if the user provides the instruction in Spanish.
-    3. Each object must have EXACTLY these properties:
-       - description (string in English)
-       - quantity (number)
-       - unit_price (number)
+    1. Respond ONLY with a valid JSON object.
+    2. Format:
+       {
+         "items": [
+           {
+             "description": "string in English",
+             "quantity": number,
+             "unit_price": number
+           }
+         ],
+         "client": {
+           "name": "string (Full name if mentioned)",
+           "email": "string (if mentioned)",
+           "company_name": "string (if mentioned)"
+         }
+       }
+    3. ALL item descriptions must be in ENGLISH.
+    4. If client info is missing, leave the client fields as null.
     
     Example response:
-    [{"description": "Web Development Services", "quantity": 1, "unit_price": 500}]
+    {
+      "items": [{"description": "Web Development", "quantity": 1, "unit_price": 500}],
+      "client": {"name": "Elon Musk", "email": "elon@tesla.com", "company_name": "Tesla"}
+    }
     
-    No explanations, no markdown code blocks, just the raw JSON array.
+    No explanations, no markdown code blocks, just raw JSON.
   `;
 
   const completion = await groq.chat.completions.create({

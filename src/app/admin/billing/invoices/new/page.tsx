@@ -26,6 +26,7 @@ export default function NewInvoicePage() {
   const [aiPrompt, setAiPrompt] = useState('')
   const [isAiLoading, setIsAiLoading] = useState(false)
   const [showAiInput, setShowAiInput] = useState(false)
+  const [suggestedClient, setSuggestedClient] = useState<{name: string, email: string, company_name?: string} | null>(null)
 
   useEffect(() => {
     fetchClients()
@@ -60,6 +61,7 @@ export default function NewInvoicePage() {
   async function handleAiAssistant() {
     if (!aiPrompt) return
     setIsAiLoading(true)
+    setSuggestedClient(null)
     try {
       const res = await fetch('/api/billing/ai-assistant', {
         method: 'POST',
@@ -67,20 +69,69 @@ export default function NewInvoicePage() {
         body: JSON.stringify({ prompt: aiPrompt })
       })
       const data = await res.json()
+      
       if (data.items) {
         setItems(data.items.map((item: any) => ({
           ...item,
           total: (item.quantity || 0) * (item.unit_price || 0)
         })))
+        
+        if (data.client && data.client.name) {
+          // Intentar buscar si el cliente ya existe
+          const { data: existingClient } = await supabase
+            .schema('billing')
+            .from('clients')
+            .select('id')
+            .ilike('name', `%${data.client.name}%`)
+            .limit(1)
+            .single()
+
+          if (existingClient) {
+            setFormData(prev => ({ ...prev, client_id: existingClient.id }))
+          } else {
+            setSuggestedClient(data.client)
+          }
+        }
+
         setShowAiInput(false)
         setAiPrompt('')
       } else {
-        alert(data.error || 'Error con el asistente IA')
+        alert(data.error || 'Error with AI assistant')
       }
     } catch (err) {
-      alert('Error llamando a la IA')
+      alert('Error calling AI')
     } finally {
       setIsAiLoading(false)
+    }
+  }
+
+  async function createSuggestedClient() {
+    if (!suggestedClient) return
+    setLoading(true)
+    try {
+      const { data, error } = await supabase
+        .schema('billing')
+        .from('clients')
+        .insert([{
+          name: suggestedClient.name,
+          email: suggestedClient.email || 'pending@change.me',
+          company_name: suggestedClient.company_name,
+          language_preference: 'en',
+          payment_preference: 'card'
+        }])
+        .select()
+        .single()
+
+      if (error) throw error
+      
+      setFormData(prev => ({ ...prev, client_id: data.id }))
+      setClients([...clients, data])
+      setSuggestedClient(null)
+      alert('Client created and assigned successfully!')
+    } catch (error: any) {
+      alert(error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -160,7 +211,7 @@ export default function NewInvoicePage() {
 
       {showAiInput && (
         <div className="mb-6 bg-purple-900/20 border border-purple-500/30 rounded-xl p-4 animate-in fade-in slide-in-from-top-2">
-          <label className="block text-sm font-medium text-purple-300 mb-2 italic">What do you want to invoice? (e.g., "Invoice for $500 for web design for Google")</label>
+          <label className="block text-sm font-medium text-purple-300 mb-2 italic">What do you want to invoice? (e.g., "Invoice for $500 for web design for a new client Elon Musk")</label>
           <div className="flex gap-2">
             <input
               type="text"
@@ -182,6 +233,31 @@ export default function NewInvoicePage() {
         </div>
       )}
       
+      {suggestedClient && (
+        <div className="mb-6 bg-blue-900/20 border border-blue-500/30 rounded-xl p-4 flex items-center justify-between animate-in zoom-in-95">
+          <div>
+            <p className="text-blue-300 text-sm font-medium">New client detected: <span className="text-white font-bold">{suggestedClient.name}</span></p>
+            <p className="text-blue-400/60 text-xs">Would you like to create this client automatically?</p>
+          </div>
+          <div className="flex gap-2">
+            <button 
+              type="button"
+              onClick={() => setSuggestedClient(null)}
+              className="px-3 py-1 text-xs text-gray-400 hover:text-white"
+            >
+              Ignore
+            </button>
+            <button 
+              type="button"
+              onClick={createSuggestedClient}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-lg shadow-blue-500/20"
+            >
+              Create & Assign
+            </button>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-[#1a1a1a] border border-zinc-800 rounded-xl p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">

@@ -8,8 +8,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    const items = await generateGroqInvoiceItems(prompt);
-    return NextResponse.json({ items });
+    const result = await generateGroqInvoiceItems(prompt);
+    return NextResponse.json(result);
   } catch (error: any) {
     console.error('Gemini AI Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
