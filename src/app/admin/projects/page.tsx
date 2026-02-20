@@ -25,7 +25,7 @@ export default function ProjectsAdmin() {
   }
 
   async function deleteProject(id: string) {
-    if (!confirm('¿Estás seguro de que quieres eliminar este proyecto?')) return;
+    if (!confirm('Are you sure you want to delete this project?')) return;
 
     const { error } = await supabase.from('projects').delete().eq('id', id);
     if (!error) {
@@ -39,46 +39,46 @@ export default function ProjectsAdmin() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Proyectos</h2>
-          <p className="text-zinc-400">Gestiona los proyectos que aparecen en tu portafolio.</p>
+        <h2 className="text-3xl font-bold tracking-tight font-syne">Projects</h2>
+        <p className="text-zinc-400 font-poppins">Manage the projects displayed in your portfolio.</p>
         </div>
         <Link 
           href="/admin/projects/new"
           className="flex items-center space-x-2 bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-zinc-200 transition-colors"
         >
           <Plus size={20} />
-          <span>Nuevo Proyecto</span>
+          <span>New Project</span>
         </Link>
       </div>
 
       <div className="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden">
-        <table className="w-full text-left">
+        <table className="w-full text-left font-poppins">
           <thead>
             <tr className="border-b border-zinc-800 bg-zinc-900/50">
-              <th className="px-6 py-4 text-sm font-medium text-zinc-400">Título</th>
-              <th className="px-6 py-4 text-sm font-medium text-zinc-400">Categoría</th>
-              <th className="px-6 py-4 text-sm font-medium text-zinc-400">Cliente</th>
-              <th className="px-6 py-4 text-sm font-medium text-zinc-400 text-right">Acciones</th>
+              <th className="px-6 py-4 text-sm font-medium text-zinc-400">Title</th>
+              <th className="px-6 py-4 text-sm font-medium text-zinc-400">Category</th>
+              <th className="px-6 py-4 text-sm font-medium text-zinc-400">Client</th>
+              <th className="px-6 py-4 text-sm font-medium text-zinc-400 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800">
             {loading ? (
               <tr>
                 <td colSpan={4} className="px-6 py-10 text-center text-zinc-500">
-                  Cargando proyectos...
+                  Loading projects...
                 </td>
               </tr>
             ) : projects.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-6 py-10 text-center text-zinc-500">
-                  No hay proyectos creados aún.
+                  No projects created yet.
                 </td>
               </tr>
             ) : (
               projects.map((project) => (
                 <tr key={project.id} className="hover:bg-zinc-900/30 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="font-medium">{project.title}</div>
+                    <div className="font-medium text-white">{project.title}</div>
                     <div className="text-xs text-zinc-500">{project.id}</div>
                   </td>
                   <td className="px-6 py-4">
