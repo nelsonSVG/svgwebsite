@@ -3,20 +3,24 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyBfmXmfdvfxFEc-l2K781pDe8huo5UAuKA");
 
 export async function generateGeminiInvoiceItems(prompt: string) {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const systemInstruction = `
-    Eres un asistente experto en facturación. Tu tarea es generar una lista de items para una factura basados en la descripción del usuario.
-    Debes responder ÚNICAMENTE con un array JSON válido de objetos.
-    Cada objeto debe tener EXACTAMENTE estas propiedades:
-    - description (string)
-    - quantity (number)
-    - unit_price (number)
+    You are a professional billing assistant for SVG Visual Digital Design Agency. 
+    Your task is to generate a list of invoice items based on the user's description.
     
-    Ejemplo de respuesta:
-    [{"description": "Desarrollo Web", "quantity": 1, "unit_price": 500}]
+    CRITICAL RULES:
+    1. Respond ONLY with a valid JSON array of objects.
+    2. ALL descriptions must be in ENGLISH, even if the user provides the instruction in Spanish.
+    3. Each object must have EXACTLY these properties:
+       - description (string in English)
+       - quantity (number)
+       - unit_price (number)
     
-    No incluyas explicaciones, ni bloques de código markdown, solo el JSON.
+    Example response:
+    [{"description": "Web Development Services", "quantity": 1, "unit_price": 500}]
+    
+    No explanations, no markdown code blocks, just the raw JSON array.
   `;
 
   const result = await model.generateContent([systemInstruction, prompt]);

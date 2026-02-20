@@ -147,27 +147,27 @@ export default function NewInvoicePage() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-white">Nueva Factura</h1>
+        <h1 className="text-2xl font-bold text-white">New Invoice</h1>
         <button
           type="button"
           onClick={() => setShowAiInput(!showAiInput)}
-          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-purple-500/20"
         >
           <Sparkles size={18} />
-          Asistente IA
+          AI Assistant
         </button>
       </div>
 
       {showAiInput && (
         <div className="mb-6 bg-purple-900/20 border border-purple-500/30 rounded-xl p-4 animate-in fade-in slide-in-from-top-2">
-          <label className="block text-sm font-medium text-purple-300 mb-2">¿Qué quieres facturar? (Describe los servicios y precios)</label>
+          <label className="block text-sm font-medium text-purple-300 mb-2 italic">What do you want to invoice? (e.g., "Invoice for $500 for web design for Google")</label>
           <div className="flex gap-2">
             <input
               type="text"
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
-              placeholder="Ej: Factura por 200 usd para desarrollo de sitio web para el cliente x..."
-              className="flex-1 bg-[#111] border border-purple-500/30 rounded-lg px-4 py-2 text-white outline-none focus:border-purple-500"
+              placeholder="Describe your invoice here..."
+              className="flex-1 bg-black border border-purple-500/30 rounded-lg px-4 py-2 text-white outline-none focus:border-purple-500"
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAiAssistant())}
             />
             <button
@@ -176,24 +176,24 @@ export default function NewInvoicePage() {
               disabled={isAiLoading || !aiPrompt}
               className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg disabled:opacity-50 flex items-center gap-2"
             >
-              {isAiLoading ? <Loader2 className="animate-spin" size={18} /> : 'Generar'}
+              {isAiLoading ? <Loader2 className="animate-spin" size={18} /> : 'Generate'}
             </button>
           </div>
         </div>
       )}
       
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-6 space-y-4">
+        <div className="bg-[#1a1a1a] border border-zinc-800 rounded-xl p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Cliente</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Client</label>
               <select
                 required
                 value={formData.client_id}
                 onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
-                className="w-full bg-[#111] border border-gray-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full bg-black border border-zinc-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
               >
-                <option value="">Seleccionar cliente...</option>
+                <option value="">Select client...</option>
                 {clients.map(c => (
                   <option key={c.id} value={c.id}>{c.name} ({c.company_name || 'Individual'})</option>
                 ))}
@@ -205,58 +205,58 @@ export default function NewInvoicePage() {
                   type="checkbox"
                   checked={isTest}
                   onChange={(e) => setIsTest(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-800 bg-gray-900 text-blue-600"
+                  className="w-4 h-4 rounded border-zinc-800 bg-zinc-900 text-blue-600"
                 />
-                <span>¿Es una factura de prueba? (Serie TEST)</span>
+                <span>Is this a test invoice? (TEST Series)</span>
               </label>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Fecha Emisión</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Issue Date</label>
               <input
                 type="date"
                 required
                 value={formData.issue_date}
                 onChange={(e) => setFormData({ ...formData, issue_date: e.target.value })}
-                className="w-full bg-[#111] border border-gray-800 rounded-lg px-4 py-2 text-white outline-none"
+                className="w-full bg-black border border-zinc-800 rounded-lg px-4 py-2 text-white outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Fecha Vencimiento</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Due Date</label>
               <input
                 type="date"
                 required
                 value={formData.due_date}
                 onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                className="w-full bg-[#111] border border-gray-800 rounded-lg px-4 py-2 text-white outline-none"
+                className="w-full bg-black border border-zinc-800 rounded-lg px-4 py-2 text-white outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Moneda</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Currency</label>
               <select
                 value={formData.currency}
                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                className="w-full bg-[#111] border border-gray-800 rounded-lg px-4 py-2 text-white outline-none"
+                className="w-full bg-black border border-zinc-800 rounded-lg px-4 py-2 text-white outline-none"
               >
-                <option value="USD">USD - Dólares</option>
-                <option value="COP">COP - Pesos Colombianos</option>
+                <option value="USD">USD - Dollars</option>
+                <option value="COP">COP - Colombian Pesos</option>
                 <option value="EUR">EUR - Euros</option>
               </select>
             </div>
           </div>
         </div>
 
-        <div className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-6">
+        <div className="bg-[#1a1a1a] border border-zinc-800 rounded-xl p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold text-white">Ítems</h2>
+            <h2 className="text-lg font-bold text-white">Line Items</h2>
             <button
               type="button"
               onClick={addItem}
               className="text-blue-400 hover:text-blue-300 text-sm"
             >
-              + Agregar Ítem
+              + Add Item
             </button>
           </div>
 
@@ -265,53 +265,53 @@ export default function NewInvoicePage() {
               <div key={index} className="grid grid-cols-12 gap-3 items-start">
                 <div className="col-span-6">
                   <input
-                    placeholder="Descripción"
+                    placeholder="Description"
                     value={item.description}
                     onChange={(e) => updateItem(index, 'description', e.target.value)}
-                    className="w-full bg-[#111] border border-gray-800 rounded-lg px-3 py-2 text-white text-sm outline-none"
+                    className="w-full bg-black border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm outline-none"
                   />
                 </div>
                 <div className="col-span-2">
                   <input
                     type="number"
-                    placeholder="Cant."
+                    placeholder="Qty"
                     value={item.quantity}
                     onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value))}
-                    className="w-full bg-[#111] border border-gray-800 rounded-lg px-3 py-2 text-white text-sm outline-none"
+                    className="w-full bg-black border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm outline-none"
                   />
                 </div>
                 <div className="col-span-2">
                   <input
                     type="number"
-                    placeholder="Precio"
+                    placeholder="Price"
                     value={item.unit_price}
                     onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value))}
-                    className="w-full bg-[#111] border border-gray-800 rounded-lg px-3 py-2 text-white text-sm outline-none"
+                    className="w-full bg-black border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm outline-none"
                   />
                 </div>
-                <div className="col-span-2 text-right py-2 text-gray-300 font-medium">
+                <div className="col-span-2 text-right py-2 text-zinc-300 font-medium">
                   ${(item.total || 0).toLocaleString()}
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-8 border-t border-gray-800 pt-4 space-y-2">
-            <div className="flex justify-between text-gray-400">
+          <div className="mt-8 border-t border-zinc-800 pt-4 space-y-2">
+            <div className="flex justify-between text-zinc-400">
               <span>Subtotal</span>
               <span>${subtotal.toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <span className="text-gray-400">Impuestos (%)</span>
+                <span className="text-zinc-400">Tax (%)</span>
                 <input
                   type="number"
                   value={formData.tax_rate}
                   onChange={(e) => setFormData({ ...formData, tax_rate: parseFloat(e.target.value) })}
-                  className="w-16 bg-[#111] border border-gray-800 rounded px-2 py-0.5 text-white text-sm"
+                  className="w-16 bg-black border border-zinc-800 rounded px-2 py-0.5 text-white text-sm"
                 />
               </div>
-              <span className="text-gray-400">${tax.toLocaleString()}</span>
+              <span className="text-zinc-400">${tax.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-white font-bold text-xl pt-2">
               <span>Total</span>
@@ -324,16 +324,16 @@ export default function NewInvoicePage() {
           <button
             type="button"
             onClick={() => window.history.back()}
-            className="px-6 py-2 text-gray-400 hover:text-white transition-colors"
+            className="px-6 py-2 text-zinc-400 hover:text-white transition-colors"
           >
-            Cancelar
+            Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg font-bold transition-colors disabled:opacity-50"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg font-bold transition-colors disabled:opacity-50 shadow-lg shadow-blue-500/20"
           >
-            {loading ? 'Creando...' : 'Crear Factura'}
+            {loading ? 'Creating...' : 'Create Invoice'}
           </button>
         </div>
       </form>
