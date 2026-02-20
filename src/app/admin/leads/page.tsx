@@ -42,9 +42,28 @@ export default function LeadsAdmin() {
   }
 
   async function deleteAllLeads() {
-    if (!confirm('CRITICAL: Are you sure you want to delete ALL leads? This cannot be undone.')) return;
-    const { error } = await supabase.from('leads').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    if (!error) setLeads([]);
+    if (!confirm(`CRITICAL: Are you sure you want to delete ALL ${activeTab} leads? This cannot be undone.`)) return;
+    
+    let query = supabase.from('leads').delete();
+    
+    if (activeTab === 'archived') {
+      query = query.eq('lead_status', 'closed');
+    } else if (activeTab === 'qualified') {
+      query = query.eq('lead_status', 'qualified');
+    } else {
+      query = query.not('lead_status', 'in', '("closed", "qualified")');
+    }
+
+    const { error } = await query;
+    if (!error) {
+      if (activeTab === 'archived') {
+        setLeads(leads.filter(l => l.lead_status !== 'closed'));
+      } else if (activeTab === 'qualified') {
+        setLeads(leads.filter(l => l.lead_status !== 'qualified'));
+      } else {
+        setLeads(leads.filter(l => l.lead_status === 'closed' || l.lead_status === 'qualified'));
+      }
+    }
   }
 
   const filteredLeads = leads.filter(lead => {
@@ -65,7 +84,7 @@ export default function LeadsAdmin() {
           className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-4 py-2 rounded-lg transition-all text-sm font-bold border border-red-500/20"
         >
           <Trash2 size={16} />
-          Delete All
+          Delete All {activeTab}
         </button>
       </div>
 
