@@ -137,8 +137,8 @@ export default function ServiceForm() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">
-          {isEditing ? 'Editar Servicio' : 'Nuevo Servicio'}
+        <h2 className="text-3xl font-bold tracking-tight font-syne">
+          {isEditing ? 'Edit Service' : 'New Service'}
         </h2>
         <button 
           onClick={() => router.back()}
@@ -149,35 +149,35 @@ export default function ServiceForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="bg-zinc-950 border border-zinc-800 rounded-2xl p-8 space-y-6">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-400">Título del Servicio</label>
+        <div className="space-y-2 font-poppins">
+          <label className="text-sm font-medium text-zinc-400">Service Title</label>
           <input 
             required
             type="text" 
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             className="w-full bg-black border border-zinc-800 rounded-lg px-4 py-2 focus:outline-none focus:border-white transition-colors"
-            placeholder="Ej: Web Design"
+            placeholder="e.g., Web Design"
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-400">Descripción</label>
+        <div className="space-y-2 font-poppins">
+          <label className="text-sm font-medium text-zinc-400">Description</label>
           <textarea 
             required
             rows={4}
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             className="w-full bg-black border border-zinc-800 rounded-lg px-4 py-2 focus:outline-none focus:border-white transition-colors resize-none"
-            placeholder="Describe el servicio..."
+            placeholder="Describe the service..."
           />
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 font-poppins">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-zinc-400">Seleccionar Icono Visual</label>
-            <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold bg-zinc-900 px-2 py-1 rounded">
-              Actual: {formData.icon_name}
+            <label className="text-sm font-medium text-zinc-400">Select Visual Icon</label>
+            <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold bg-zinc-900 px-2 py-1 rounded font-poppins">
+              Current: {formData.icon_name}
             </span>
           </div>
           
@@ -192,10 +192,10 @@ export default function ServiceForm() {
                   onClick={() => setFormData({ ...formData, icon_name: item.id })}
                   title={item.label}
                   className={`
-                    flex flex-col items-center justify-center p-3 rounded-lg border transition-all
+                    flex flex-col items-center justify-center p-3 rounded-lg border transition-all font-poppins
                     ${isSelected 
                       ? 'bg-white text-black border-white scale-110 shadow-lg' 
-                      : 'bg-zinc-900/50 text-zinc-500 border-zinc-800 hover:border-zinc-500 hover:text-white'}
+                      : 'bg-zinc-900/50 text-zinc-500 border-zinc-800 hover:border-zinc-500 hover:text-white'} 
                   `}
                 >
                   <IconComp size={20} />
@@ -209,17 +209,17 @@ export default function ServiceForm() {
           <button 
             type="submit"
             disabled={loading}
-            className="flex-1 bg-white text-black py-3 rounded-lg font-bold hover:bg-zinc-200 transition-colors flex items-center justify-center space-x-2"
+            className="flex-1 bg-white text-black py-3 rounded-lg font-bold hover:bg-zinc-200 transition-colors flex items-center justify-center space-x-2 font-poppins"
           >
             <Save size={20} />
-            <span>{loading ? 'Guardando...' : 'Guardar Servicio'}</span>
+            <span>{loading ? 'Saving...' : 'Save Service'}</span>
           </button>
           <button 
             type="button"
             onClick={() => router.push('/admin/services')}
-            className="flex-1 bg-zinc-900 text-white py-3 rounded-lg font-bold hover:bg-zinc-800 transition-colors"
+            className="flex-1 bg-zinc-900 text-white py-3 rounded-lg font-bold hover:bg-zinc-800 transition-colors font-poppins"
           >
-            Cancelar
+            Cancel
           </button>
         </div>
       </form>

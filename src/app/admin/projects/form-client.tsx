@@ -169,21 +169,21 @@ export default function ProjectForm() {
           <Link href="/admin/projects" className="p-2 hover:bg-zinc-900 rounded-full transition-colors">
             <ArrowLeft size={24} />
           </Link>
-          <h2 className="text-3xl font-bold tracking-tight">
-            {isEdit ? 'Editar Proyecto' : 'Nuevo Proyecto'}
+          <h2 className="text-3xl font-bold tracking-tight font-syne">
+            {isEdit ? 'Edit Project' : 'New Project'}
           </h2>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-400">ID del Proyecto (slug)</label>
+            <label className="text-sm font-medium text-zinc-400">Project ID (slug)</label>
             <input
               type="text"
               required
               disabled={isEdit}
-              placeholder="ej: techflow-dashboard"
+              placeholder="e.g., techflow-dashboard"
               value={formData.id}
               onChange={e => setFormData({ ...formData, id: e.target.value })}
               className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50"
@@ -191,11 +191,11 @@ export default function ProjectForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-400">Título</label>
+            <label className="text-sm font-medium text-zinc-400">Title</label>
             <input
               type="text"
               required
-              placeholder="Título del proyecto"
+              placeholder="Project title"
               value={formData.title}
               onChange={e => setFormData({ ...formData, title: e.target.value })}
               className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
@@ -203,7 +203,7 @@ export default function ProjectForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-400">Categoría (ID)</label>
+            <label className="text-sm font-medium text-zinc-400">Category (ID)</label>
             <select
               value={formData.category}
               onChange={e => setFormData({ ...formData, category: e.target.value })}
@@ -217,11 +217,11 @@ export default function ProjectForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-400">Etiqueta de Categoría</label>
+            <label className="text-sm font-medium text-zinc-400">Category Label</label>
             <input
               type="text"
               required
-              placeholder="ej: Web Design"
+              placeholder="e.g., Web Design"
               value={formData.category_label}
               onChange={e => setFormData({ ...formData, category_label: e.target.value })}
               className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
@@ -229,10 +229,10 @@ export default function ProjectForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-400">Cliente</label>
+            <label className="text-sm font-medium text-zinc-400">Client</label>
             <input
               type="text"
-              placeholder="Nombre del cliente"
+              placeholder="Client name"
               value={formData.client}
               onChange={e => setFormData({ ...formData, client: e.target.value })}
               className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
@@ -240,7 +240,7 @@ export default function ProjectForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-400">Año</label>
+            <label className="text-sm font-medium text-zinc-400">Year</label>
             <input
               type="text"
               placeholder="2024"
@@ -251,19 +251,19 @@ export default function ProjectForm() {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-400">Descripción</label>
+        <div className="space-y-2 font-poppins">
+          <label className="text-sm font-medium text-zinc-400">Description</label>
           <textarea
             rows={4}
-            placeholder="Descripción detallada del proyecto..."
+            placeholder="Detailed project description..."
             value={formData.description}
             onChange={e => setFormData({ ...formData, description: e.target.value })}
             className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none"
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-400">Servicios (Presiona Enter para agregar)</label>
+        <div className="space-y-2 font-poppins">
+          <label className="text-sm font-medium text-zinc-400">Services (Press Enter to add)</label>
           <div className="flex flex-wrap gap-2 mb-2">
             {formData.services.map(service => (
               <span key={service} className="flex items-center space-x-1 px-3 py-1 bg-zinc-800 rounded-full text-sm">
@@ -276,7 +276,7 @@ export default function ProjectForm() {
           </div>
           <input
             type="text"
-            placeholder="Agregar servicio..."
+            placeholder="Add service..."
             value={serviceInput}
             onChange={e => setServiceInput(e.target.value)}
             onKeyDown={handleServiceAdd}
@@ -284,8 +284,8 @@ export default function ProjectForm() {
           />
         </div>
 
-        <div className="space-y-4">
-          <label className="text-sm font-medium text-zinc-400">Imágenes</label>
+        <div className="space-y-4 font-poppins">
+          <label className="text-sm font-medium text-zinc-400">Images</label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {formData.images.map((url, index) => (
               <div key={index} className="relative aspect-[4/5] bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800">
@@ -304,7 +304,7 @@ export default function ProjectForm() {
               ${uploading ? 'opacity-50 cursor-not-allowed' : ''}
             `}>
               {uploading ? <Loader2 className="animate-spin" /> : <Upload />}
-              <span className="mt-2 text-xs text-zinc-500">{uploading ? 'Subiendo...' : 'Subir Imagen'}</span>
+              <span className="mt-2 text-xs text-zinc-500">{uploading ? 'Uploading...' : 'Upload Image'}</span>
               <input 
                 type="file" 
                 multiple 
@@ -321,10 +321,10 @@ export default function ProjectForm() {
           <button
             type="submit"
             disabled={loading || uploading}
-            className="flex items-center space-x-2 bg-white text-black px-8 py-3 rounded-xl font-bold hover:bg-zinc-200 transition-colors disabled:opacity-50"
+            className="flex items-center space-x-2 bg-white text-black px-8 py-3 rounded-xl font-bold hover:bg-zinc-200 transition-colors disabled:opacity-50 font-poppins"
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-            <span>{isEdit ? 'Actualizar Proyecto' : 'Guardar Proyecto'}</span>
+            <span>{isEdit ? 'Update Project' : 'Save Project'}</span>
           </button>
         </div>
       </form>
