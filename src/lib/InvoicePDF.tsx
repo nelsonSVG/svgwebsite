@@ -11,15 +11,19 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 40,
+    marginBottom: 30,
+    borderBottomWidth: 1,
+    borderBottomColor: '#000',
+    paddingBottom: 20,
   },
   logo: {
     width: 120,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#000',
+    letterSpacing: -1,
   },
   invoiceInfo: {
     textAlign: 'right',
@@ -98,12 +102,13 @@ export const InvoicePDF = ({ invoice, client, items }: { invoice: Invoice, clien
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>INVOICE</Text>
-          <Text>{invoice.invoice_number}</Text>
+          <Text style={{ fontSize: 14, marginTop: 5, color: '#666' }}>#{invoice.invoice_number}</Text>
         </View>
         <View style={styles.invoiceInfo}>
-          <Text style={{ fontWeight: 'bold' }}>SVG Visual Digital Design Agency</Text>
+          <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Nelson Casallas</Text>
+          <Text style={{ fontSize: 9, color: '#666', marginTop: 2 }}>Independent Contractor / Design & Web Consultant</Text>
+          <Text style={{ marginTop: 8 }}>nelson@svg.com.co</Text>
           <Text>Cali, Colombia</Text>
-          <Text>nelson@svg.com.co</Text>
         </View>
       </View>
 
