@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { Invoice, Client, InvoiceItem } from '@/lib/types'
 import { Loader2, Download, CreditCard } from 'lucide-react'
 import { format } from 'date-fns'
 
-export default function PublicInvoicePage({ params }: { params: { number: string } }) {
+export default function PublicInvoicePage({ params }: { params: Promise<{ number: string }> }) {
+  const resolvedParams = use(params)
   const [invoice, setInvoice] = useState<Invoice | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -20,14 +21,14 @@ export default function PublicInvoicePage({ params }: { params: { number: string
           client:client_id (*),
           items:invoice_items (*)
         `)
-        .eq('invoice_number', params.number)
+        .eq('invoice_number', resolvedParams.number)
         .single()
       
       if (data) setInvoice(data)
       setLoading(false)
     }
     fetchInvoice()
-  }, [params.number])
+  }, [resolvedParams.number])
 
   const handleEpaycoPayment = () => {
     if (!invoice) return
