@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import { Calendar, Mail, Phone, Tag, CheckCircle2, Clock } from 'lucide-react';
+import { Calendar, Mail, Phone, Tag, CheckCircle2, Clock, Trash2, Archive, Star } from 'lucide-react';
 
 export default function LeadsAdmin() {
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'pending' | 'qualified' | 'archived'>('pending');
 
   useEffect(() => {
     fetchLeads();
@@ -34,22 +35,63 @@ export default function LeadsAdmin() {
     }
   }
 
+  async function deleteLead(id: string) {
+    if (!confirm('Are you sure you want to delete this lead?')) return;
+    const { error } = await supabase.from('leads').delete().eq('id', id);
+    if (!error) setLeads(leads.filter(l => l.id !== id));
+  }
+
+  async function deleteAllLeads() {
+    if (!confirm('CRITICAL: Are you sure you want to delete ALL leads? This cannot be undone.')) return;
+    const { error } = await supabase.from('leads').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    if (!error) setLeads([]);
+  }
+
+  const filteredLeads = leads.filter(lead => {
+    if (activeTab === 'archived') return lead.lead_status === 'closed';
+    if (activeTab === 'qualified') return lead.lead_status === 'qualified';
+    return lead.lead_status !== 'closed' && lead.lead_status !== 'qualified';
+  });
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Prospectos (Leads)</h2>
-        <p className="text-zinc-400">Personas que han contactado a través del asistente IA.</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight font-syne">Leads Management</h2>
+          <p className="text-zinc-400 font-poppins">Manage potential clients from your AI Assistant.</p>
+        </div>
+        <button 
+          onClick={deleteAllLeads}
+          className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-4 py-2 rounded-lg transition-all text-sm font-bold border border-red-500/20"
+        >
+          <Trash2 size={16} />
+          Delete All
+        </button>
+      </div>
+
+      <div className="flex gap-2 p-1 bg-zinc-900/50 border border-zinc-800 rounded-xl w-fit">
+        {(['pending', 'qualified', 'archived'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all capitalize ${
+              activeTab === tab ? 'bg-white text-black shadow-lg' : 'text-zinc-500 hover:text-white'
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
       <div className="space-y-4">
         {loading ? (
-          <p className="text-zinc-500">Cargando prospectos...</p>
-        ) : leads.length === 0 ? (
-          <div className="p-10 text-center bg-zinc-900 border border-zinc-800 rounded-2xl">
-            <p className="text-zinc-500">Aún no has recibido ningún lead.</p>
+          <p className="text-zinc-500">Loading leads...</p>
+        ) : filteredLeads.length === 0 ? (
+          <div className="p-20 text-center bg-zinc-900/30 border border-dashed border-zinc-800 rounded-3xl">
+            <p className="text-zinc-500 font-medium">No {activeTab} leads found.</p>
           </div>
         ) : (
-          leads.map((lead) => (
+          filteredLeads.map((lead) => (
             <div key={lead.id} className="p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-zinc-700 transition-colors">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="space-y-1">
@@ -84,24 +126,24 @@ export default function LeadsAdmin() {
                 <div className="flex items-center space-x-2">
                   <button 
                     onClick={() => updateStatus(lead.id, 'qualified')}
-                    className="p-2 hover:bg-zinc-900 rounded-lg text-blue-500 transition-colors"
-                    title="Marcar como calificado"
+                    className={`p-2 hover:bg-zinc-900 rounded-lg transition-colors ${lead.lead_status === 'qualified' ? 'text-blue-400 bg-blue-500/10' : 'text-zinc-500'}`}
+                    title="Mark as Qualified"
                   >
-                    <CheckCircle2 size={20} />
+                    <Star size={20} fill={lead.lead_status === 'qualified' ? 'currentColor' : 'none'} />
                   </button>
                   <button 
                     onClick={() => updateStatus(lead.id, 'closed')}
-                    className="p-2 hover:bg-zinc-900 rounded-lg text-green-500 transition-colors"
-                    title="Marcar como cerrado"
+                    className={`p-2 hover:bg-zinc-900 rounded-lg transition-colors ${lead.lead_status === 'closed' ? 'text-green-400 bg-green-500/10' : 'text-zinc-500'}`}
+                    title="Archive Lead (Closed)"
                   >
-                    <CheckCircle2 size={20} />
+                    <Archive size={20} />
                   </button>
                   <button 
-                    onClick={() => updateStatus(lead.id, 'in_progress')}
-                    className="p-2 hover:bg-zinc-900 rounded-lg text-yellow-500 transition-colors"
-                    title="Marcar como pendiente"
+                    onClick={() => deleteLead(lead.id)}
+                    className="p-2 hover:bg-red-500/10 rounded-lg text-zinc-500 hover:text-red-500 transition-colors"
+                    title="Delete Lead"
                   >
-                    <Clock size={20} />
+                    <Trash2 size={20} />
                   </button>
                 </div>
               </div>
