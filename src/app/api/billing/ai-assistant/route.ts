@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { generateGeminiInvoiceItems } from '@/lib/geminiBillingService';
+import { generateGroqInvoiceItems } from '@/lib/groqBillingService';
 
 export async function POST(req: Request) {
   try {
@@ -8,7 +8,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    const items = await generateGeminiInvoiceItems(prompt);
+    const items = await generateGroqInvoiceItems(prompt);
     return NextResponse.json({ items });
   } catch (error: any) {
     console.error('Gemini AI Error:', error);
