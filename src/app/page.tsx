@@ -133,11 +133,12 @@ export default function Home() {
       ]);
 
       if (projectsRes.data && projectsRes.data.length > 0) {
-        // Map snake_case from DB to camelCase expected by Project type if needed
-        // but looking at types.ts might be needed. Let's assume they match for now or map.
+        // Map snake_case from DB to camelCase and apply translations
         const mappedProjects = projectsRes.data.map(p => ({
           ...p,
-          categoryLabel: p.category_label // Map DB field to Type field
+          categoryLabel: language === 'es' && p.category_label_es ? p.category_label_es : p.category_label,
+          title: language === 'es' && p.title_es ? p.title_es : p.title,
+          description: language === 'es' && p.description_es ? p.description_es : p.description
         })) as Project[];
         setProjectsData(mappedProjects);
       }
@@ -149,7 +150,9 @@ export default function Home() {
       if (servicesRes.data && servicesRes.data.length > 0) {
         const mappedServices = servicesRes.data.map(s => ({
           ...s,
-          iconName: s.icon_name
+          iconName: s.icon_name,
+          title: language === 'es' && s.title_es ? s.title_es : s.title,
+          description: language === 'es' && s.description_es ? s.description_es : s.description
         })) as Service[];
         setServicesData(mappedServices);
       }

@@ -44,10 +44,33 @@ export default function ServiceForm() {
     e.preventDefault();
     setLoading(true);
 
+    // 1. Traducir automáticamente si estamos creando o si el título/descripción cambió
+    let titleEs = '';
+    let descriptionEs = '';
+
+    try {
+      const [titleRes, descRes] = await Promise.all([
+        fetch('/api/translate', {
+          method: 'POST',
+          body: JSON.stringify({ text: formData.title, context: "Service title for a design agency" })
+        }).then(r => r.json()),
+        fetch('/api/translate', {
+          method: 'POST',
+          body: JSON.stringify({ text: formData.description, context: "Service description for a design agency" })
+        }).then(r => r.json())
+      ]);
+      titleEs = titleRes.translation;
+      descriptionEs = descRes.translation;
+    } catch (err) {
+      console.error('Auto-translation failed:', err);
+    }
+
     const serviceData = {
       title: formData.title,
       description: formData.description,
       icon_name: formData.icon_name,
+      title_es: titleEs || formData.title,
+      description_es: descriptionEs || formData.description,
     };
 
     let error;

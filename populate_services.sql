@@ -1,18 +1,14 @@
--- Script para inicializar servicios y configurar RLS
+-- Script corregido para inicializar servicios en Supabase
+-- Este script soluciona el error de ID nulo asegurando la generación automática de UUID
 
--- 1. Asegurar que la tabla existe (por si acaso)
-CREATE TABLE IF NOT EXISTS public.services (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    title TEXT NOT NULL,
-    description TEXT,
-    icon_name TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+-- 1. Asegurar que la tabla tenga la configuración correcta de ID automático
+ALTER TABLE public.services 
+    ALTER COLUMN id SET DEFAULT gen_random_uuid();
 
--- 2. Limpiar datos antiguos (opcional, para evitar duplicados en este paso)
-DELETE FROM public.services;
+-- 2. Limpiar datos antiguos
+TRUNCATE TABLE public.services RESTART IDENTITY CASCADE;
 
--- 3. Insertar los servicios originales
+-- 3. Insertar los servicios (Supabase generará los IDs automáticamente gracias al DEFAULT)
 INSERT INTO public.services (title, description, icon_name)
 VALUES 
 ('Web Design', 'Immersive, high-performance websites that blend stunning aesthetics with seamless functionality to tell your brand story.', 'layout'),
@@ -22,14 +18,14 @@ VALUES
 ('UI/UX Design', 'Designing interfaces that delight and experiences that convert. We bridge the gap between human needs and business goals.', 'layers'),
 ('AI Automation', 'Integrating intelligent automation into your digital products to enhance efficiency and personalize user experiences.', 'cpu');
 
--- 4. Habilitar RLS
+-- 4. Asegurar RLS y políticas
 ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
 
--- 5. Crear políticas de RLS
--- Permitir lectura pública
-CREATE POLICY "Allow public read access" ON public.services
+DROP POLICY IF EXISTS "Enable read access for all users" ON public.services;
+DROP POLICY IF EXISTS "Enable all access for authenticated users" ON public.services;
+
+CREATE POLICY "Enable read access for all users" ON public.services
     FOR SELECT USING (true);
 
--- Permitir gestión total a usuarios autenticados (admin)
-CREATE POLICY "Allow authenticated full access" ON public.services
+CREATE POLICY "Enable all access for authenticated users" ON public.services
     FOR ALL USING (auth.role() = 'authenticated');

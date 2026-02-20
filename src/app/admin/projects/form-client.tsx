@@ -108,10 +108,40 @@ export default function ProjectForm() {
     e.preventDefault();
     setLoading(true);
 
+    // 1. Traducir automáticamente
+    let titleEs = '';
+    let descriptionEs = '';
+    let categoryLabelEs = '';
+
+    try {
+      const [titleRes, descRes, catRes] = await Promise.all([
+        fetch('/api/translate', {
+          method: 'POST',
+          body: JSON.stringify({ text: formData.title, context: "Project title for a design agency portfolio" })
+        }).then(r => r.json()),
+        fetch('/api/translate', {
+          method: 'POST',
+          body: JSON.stringify({ text: formData.description, context: "Project description for a design agency portfolio" })
+        }).then(r => r.json()),
+        fetch('/api/translate', {
+          method: 'POST',
+          body: JSON.stringify({ text: formData.category_label, context: "Project category label" })
+        }).then(r => r.json())
+      ]);
+      titleEs = titleRes.translation;
+      descriptionEs = descRes.translation;
+      categoryLabelEs = catRes.translation;
+    } catch (err) {
+      console.error('Auto-translation failed:', err);
+    }
+
     const { error } = await supabase
       .from('projects')
       .upsert({
         ...formData,
+        title_es: titleEs || formData.title,
+        description_es: descriptionEs || formData.description,
+        category_label_es: categoryLabelEs || formData.category_label,
         updated_at: new Date().toISOString()
       });
 
