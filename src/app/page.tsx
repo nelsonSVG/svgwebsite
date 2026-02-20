@@ -124,7 +124,11 @@ export default function Home() {
     // Load CMS Data from Supabase
     const fetchCmsData = async () => {
       // Set default local services as fallback
-      setServicesData(SERVICES);
+      setServicesData(SERVICES.map(s => ({
+        ...s,
+        title: language === 'es' ? (s as any).title_es || s.title : s.title,
+        description: language === 'es' ? (s as any).description_es || s.description : s.description
+      })));
 
       const [projectsRes, testimonialsRes, servicesRes] = await Promise.all([
         supabase.from('projects').select('*').order('created_at', { ascending: false }),
@@ -133,7 +137,6 @@ export default function Home() {
       ]);
 
       if (projectsRes.data && projectsRes.data.length > 0) {
-        // Map snake_case from DB to camelCase and apply translations
         const mappedProjects = projectsRes.data.map(p => ({
           ...p,
           categoryLabel: language === 'es' && p.category_label_es ? p.category_label_es : p.category_label,
@@ -185,7 +188,7 @@ export default function Home() {
     };
 
     fetchInstagram();
-  }, []);
+  }, [language]);
 
   const filteredProjects = activeCategory === ProjectCategory.ALL 
     ? projectsData 

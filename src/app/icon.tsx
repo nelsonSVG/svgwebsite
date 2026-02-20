@@ -26,7 +26,7 @@ export default function Icon() {
           justifyContent: 'center',
           color: 'black',
           borderRadius: '6px',
-          fontWeight: 800, // Syne boldest weight
+          fontWeight: 700, // Syne Bold
           fontFamily: 'Syne, sans-serif',
         }}
       >
