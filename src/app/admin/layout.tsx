@@ -12,7 +12,9 @@ import {
   LogOut,
   Users,
   Menu,
-  X
+  X,
+  Receipt,
+  UserCircle
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -68,6 +70,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     { name: 'Servicios', icon: Settings, href: '/admin/services' },
     { name: 'Testimonios', icon: MessageSquare, href: '/admin/testimonials' },
     { name: 'Leads', icon: Users, href: '/admin/leads' },
+    { name: 'Facturas', icon: Receipt, href: '/admin/billing/invoices' },
+    { name: 'Clientes', icon: UserCircle, href: '/admin/billing/clients' },
     { name: 'Ajustes', icon: Settings, href: '/admin/settings' },
   ];
 

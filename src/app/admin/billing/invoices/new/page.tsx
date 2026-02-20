@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { Invoice, Client, InvoiceItem } from '@/lib/types'
 import { format } from 'date-fns'
+import { Sparkles, Loader2 } from 'lucide-react'
 
 export default function NewInvoicePage() {
   const [clients, setClients] = useState<Client[]>([])
@@ -22,6 +23,9 @@ export default function NewInvoicePage() {
   const [items, setItems] = useState<Partial<InvoiceItem>[]>([
     { description: '', quantity: 1, unit_price: 0, total: 0 }
   ])
+  const [aiPrompt, setAiPrompt] = useState('')
+  const [isAiLoading, setIsAiLoading] = useState(false)
+  const [showAiInput, setShowAiInput] = useState(false)
 
   useEffect(() => {
     fetchClients()
@@ -52,6 +56,33 @@ export default function NewInvoicePage() {
   const subtotal = items.reduce((sum, item) => sum + (item.total || 0), 0)
   const tax = subtotal * (formData.tax_rate / 100)
   const total = subtotal + tax
+
+  async function handleAiAssistant() {
+    if (!aiPrompt) return
+    setIsAiLoading(true)
+    try {
+      const res = await fetch('/api/billing/ai-assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: aiPrompt })
+      })
+      const data = await res.json()
+      if (data.items) {
+        setItems(data.items.map((item: any) => ({
+          ...item,
+          total: (item.quantity || 0) * (item.unit_price || 0)
+        })))
+        setShowAiInput(false)
+        setAiPrompt('')
+      } else {
+        alert(data.error || 'Error con el asistente IA')
+      }
+    } catch (err) {
+      alert('Error llamando a la IA')
+    } finally {
+      setIsAiLoading(false)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -115,7 +146,41 @@ export default function NewInvoicePage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-white mb-6">Nueva Factura</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-white">Nueva Factura</h1>
+        <button
+          type="button"
+          onClick={() => setShowAiInput(!showAiInput)}
+          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          <Sparkles size={18} />
+          Asistente IA
+        </button>
+      </div>
+
+      {showAiInput && (
+        <div className="mb-6 bg-purple-900/20 border border-purple-500/30 rounded-xl p-4 animate-in fade-in slide-in-from-top-2">
+          <label className="block text-sm font-medium text-purple-300 mb-2">¿Qué quieres facturar? (Describe los servicios y precios)</label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="Ej: Factura por 200 usd para desarrollo de sitio web para el cliente x..."
+              className="flex-1 bg-[#111] border border-purple-500/30 rounded-lg px-4 py-2 text-white outline-none focus:border-purple-500"
+              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAiAssistant())}
+            />
+            <button
+              type="button"
+              onClick={handleAiAssistant}
+              disabled={isAiLoading || !aiPrompt}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg disabled:opacity-50 flex items-center gap-2"
+            >
+              {isAiLoading ? <Loader2 className="animate-spin" size={18} /> : 'Generar'}
+            </button>
+          </div>
+        </div>
+      )}
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-6 space-y-4">
