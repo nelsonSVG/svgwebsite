@@ -295,15 +295,46 @@ export default function Home() {
 
       {/* --- MOBILE MENU --- */}
       <div className={`fixed inset-0 bg-[#0a0a0a] z-50 flex flex-col items-center justify-center gap-8 transition-transform duration-500 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <NavLink mobile href="#services" onClick={() => setIsMobileMenuOpen(false)}>Services</NavLink>
-        <NavLink mobile href="#projects" onClick={() => setIsMobileMenuOpen(false)}>Projects</NavLink>
-        <NavLink mobile href="#about" onClick={() => setIsMobileMenuOpen(false)}>About</NavLink>
-        <NavLink mobile href="#contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</NavLink>
+        <NavLink mobile href="#services" onClick={() => setIsMobileMenuOpen(false)}>{t('nav.services')}</NavLink>
+        <NavLink mobile href="#projects" onClick={() => setIsMobileMenuOpen(false)}>{t('nav.projects')}</NavLink>
+        <NavLink mobile href="#about" onClick={() => setIsMobileMenuOpen(false)}>{t('nav.about')}</NavLink>
+        <NavLink mobile href="#contact" onClick={() => setIsMobileMenuOpen(false)}>{t('nav.contact')}</NavLink>
+        
+        {/* Language Switcher Mobile */}
+        <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-1 mt-4">
+          <button 
+            onClick={() => setLanguage('en')}
+            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${language === 'en' ? 'bg-white text-black' : 'text-zinc-500 hover:text-white'}`}
+          >
+            EN
+          </button>
+          <button 
+            onClick={() => setLanguage('es')}
+            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${language === 'es' ? 'bg-white text-black' : 'text-zinc-500 hover:text-white'}`}
+          >
+            ES
+          </button>
+        </div>
+
+        {/* Instagram Mobile */}
+        <a 
+          href="https://www.instagram.com/svg.visual/" 
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center hover:border-white hover:bg-white hover:text-black transition-all duration-300 mt-4"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <circle cx="17.5" cy="6.5" r="1.5"></circle>
+          </svg>
+        </a>
+
         <button 
           onClick={() => { setIsAssistantOpen(true); setIsMobileMenuOpen(false); }}
           className="mt-8 bg-white text-black px-10 py-4 rounded-full font-bold text-xl"
         >
-          Let&apos;s Talk
+          {t('nav.talk')}
         </button>
       </div>
 
@@ -359,7 +390,7 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
             {servicesData.map((service, index) => (
               <div 
                 key={service.id} 
