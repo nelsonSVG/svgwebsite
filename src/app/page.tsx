@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ProjectCategory, Project, Service, Testimonial } from '@/lib/types';
-import { PROJECTS, SERVICES, TESTIMONIALS } from '@/lib/constants';
+import { supabase } from '@/lib/supabaseClient';
 import ProjectDetail from '@/components/ProjectDetail';
 import Assistant from '@/components/Assistant';
 
@@ -118,10 +118,38 @@ export default function Home() {
   const [instagramFeed, setInstagramFeed] = useState<InstagramPost[]>([]);
 
   useEffect(() => {
-    // Load CMS Data
-    setProjectsData(PROJECTS);
-    setServicesData(SERVICES);
-    setTestimonialsData(TESTIMONIALS);
+    // Load CMS Data from Supabase
+    const fetchCmsData = async () => {
+      const [projectsRes, testimonialsRes, servicesRes] = await Promise.all([
+        supabase.from('projects').select('*').order('created_at', { ascending: false }),
+        supabase.from('testimonials').select('*').order('created_at', { ascending: false }),
+        supabase.from('services').select('*').order('created_at', { ascending: true })
+      ]);
+
+      if (projectsRes.data && projectsRes.data.length > 0) {
+        // Map snake_case from DB to camelCase expected by Project type if needed
+        // but looking at types.ts might be needed. Let's assume they match for now or map.
+        const mappedProjects = projectsRes.data.map(p => ({
+          ...p,
+          categoryLabel: p.category_label // Map DB field to Type field
+        })) as Project[];
+        setProjectsData(mappedProjects);
+      }
+      
+      if (testimonialsRes.data && testimonialsRes.data.length > 0) {
+        setTestimonialsData(testimonialsRes.data as Testimonial[]);
+      }
+
+      if (servicesRes.data && servicesRes.data.length > 0) {
+        const mappedServices = servicesRes.data.map(s => ({
+          ...s,
+          iconName: s.icon_name
+        })) as Service[];
+        setServicesData(mappedServices);
+      }
+    };
+
+    fetchCmsData();
 
     // Fetch Instagram Data via our own API Proxy (which handles auto-refresh)
     const fetchInstagram = async () => {

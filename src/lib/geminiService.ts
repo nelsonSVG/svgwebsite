@@ -1,6 +1,6 @@
 // Client-side service that calls the Next.js API route instead of Gemini directly
 
-export const chatWithAssistant = async (message: string, _history: { role: 'user' | 'model', parts: { text: string }[] }[]) => {
+export const chatWithAssistant = async (message: string) => {
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
