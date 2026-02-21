@@ -10,9 +10,21 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co', 
-  supabaseAnonKey || 'placeholder-key'
+  supabaseAnonKey || 'placeholder-key',
+  {
+    db: {
+      schema: 'public'
+    }
+  }
 );
 
+// Note: To use the 'billing' schema, you should use: supabase.schema('billing').from(...)
+// This client is configured to allow multiple schemas if they are exposed in Supabase settings.
+
 export const supabaseAdmin = supabaseServiceKey 
-  ? createClient(supabaseUrl!, supabaseServiceKey)
+  ? createClient(supabaseUrl!, supabaseServiceKey, {
+      db: {
+        schema: 'public'
+      }
+    })
   : null;
