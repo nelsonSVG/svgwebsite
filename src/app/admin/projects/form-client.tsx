@@ -108,7 +108,7 @@ export default function ProjectForm() {
     e.preventDefault();
     setLoading(true);
 
-    // 1. Traducir automáticamente
+    // Auto-translate
     let titleEs = '';
     let descriptionEs = '';
     let categoryLabelEs = '';
@@ -146,7 +146,7 @@ export default function ProjectForm() {
       });
 
     if (error) {
-      alert('Error al guardar: ' + error.message);
+      alert('Error saving: ' + error.message);
     } else {
       router.push('/admin/projects');
       router.refresh();

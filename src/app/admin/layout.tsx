@@ -66,13 +66,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
-    { name: 'Proyectos', icon: Briefcase, href: '/admin/projects' },
-    { name: 'Servicios', icon: Settings, href: '/admin/services' },
-    { name: 'Testimonios', icon: MessageSquare, href: '/admin/testimonials' },
+    { name: 'Projects', icon: Briefcase, href: '/admin/projects' },
+    { name: 'Services', icon: Settings, href: '/admin/services' },
+    { name: 'Testimonials', icon: MessageSquare, href: '/admin/testimonials' },
     { name: 'Leads', icon: Users, href: '/admin/leads' },
-    { name: 'Facturas', icon: Receipt, href: '/admin/billing/invoices' },
-    { name: 'Clientes', icon: UserCircle, href: '/admin/billing/clients' },
-    { name: 'Ajustes', icon: Settings, href: '/admin/settings' },
+    { name: 'Invoices', icon: Receipt, href: '/admin/billing/invoices' },
+    { name: 'Clients', icon: UserCircle, href: '/admin/billing/clients' },
+    { name: 'Settings', icon: Settings, href: '/admin/settings' },
   ];
 
   if (loading) {

@@ -81,7 +81,7 @@ export default function LeadsAdmin() {
         </div>
         <button 
           onClick={deleteAllLeads}
-          className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-4 py-2 rounded-lg transition-all text-sm font-bold border border-red-500/20"
+          className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-4 py-2 rounded-lg transition-all text-sm font-bold border border-red-500/20 font-poppins"
         >
           <Trash2 size={16} />
           Delete All {activeTab}
@@ -93,7 +93,7 @@ export default function LeadsAdmin() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all capitalize ${
+            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all capitalize font-poppins ${
               activeTab === tab ? 'bg-white text-black shadow-lg' : 'text-zinc-500 hover:text-white'
             }`}
           >
@@ -104,10 +104,10 @@ export default function LeadsAdmin() {
 
       <div className="space-y-4">
         {loading ? (
-          <p className="text-zinc-500">Loading leads...</p>
+          <p className="text-zinc-500 font-poppins">Loading leads...</p>
         ) : filteredLeads.length === 0 ? (
           <div className="p-20 text-center bg-zinc-900/30 border border-dashed border-zinc-800 rounded-3xl">
-            <p className="text-zinc-500 font-medium">No {activeTab} leads found.</p>
+            <p className="text-zinc-500 font-medium font-poppins">No {activeTab} leads found.</p>
           </div>
         ) : (
           filteredLeads.map((lead) => (
@@ -115,8 +115,8 @@ export default function LeadsAdmin() {
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center space-x-3">
-                    <h3 className="text-xl font-bold">{lead.full_name || 'Sin nombre'}</h3>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                    <h3 className="text-xl font-bold font-syne">{lead.full_name || 'No name'}</h3>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium font-poppins ${
                       lead.lead_status === 'closed' ? 'bg-green-500/10 text-green-500' :
                       lead.lead_status === 'qualified' ? 'bg-blue-500/10 text-blue-500' :
                       'bg-yellow-500/10 text-yellow-500'
@@ -124,10 +124,10 @@ export default function LeadsAdmin() {
                       {lead.lead_status}
                     </span>
                   </div>
-                  <div className="text-zinc-400 font-medium">{lead.brand_name}</div>
+                  <div className="text-zinc-400 font-medium font-poppins">{lead.brand_name}</div>
                 </div>
 
-                <div className="flex flex-wrap gap-4 text-sm text-zinc-400">
+                <div className="flex flex-wrap gap-4 text-sm text-zinc-400 font-poppins">
                   <div className="flex items-center space-x-1">
                     <Mail size={16} />
                     <span>{lead.email}</span>
@@ -169,20 +169,20 @@ export default function LeadsAdmin() {
 
               <div className="mt-6 pt-6 border-t border-zinc-900 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
-                  <div className="flex items-center space-x-2 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                  <div className="flex items-center space-x-2 text-xs font-bold text-zinc-500 uppercase tracking-wider font-poppins">
                     <Tag size={12} />
-                    <span>Servicio & Proyecto</span>
+                    <span>Service & Project</span>
                   </div>
-                  <p className="text-sm">
+                  <p className="text-sm font-poppins">
                     {lead.service_type} - {lead.project_type}
                   </p>
                 </div>
                 <div className="md:col-span-2 space-y-2">
-                  <div className="flex items-center space-x-2 text-xs font-bold text-zinc-500 uppercase tracking-wider">
-                    <span>Resumen del Brief</span>
+                  <div className="flex items-center space-x-2 text-xs font-bold text-zinc-500 uppercase tracking-wider font-poppins">
+                    <span>Brief Summary</span>
                   </div>
-                  <p className="text-sm text-zinc-300">
-                    {lead.summary_brief || lead.objective || 'Sin detalles adicionales.'}
+                  <p className="text-sm text-zinc-300 font-poppins">
+                    {lead.summary_brief || lead.objective || 'No additional details.'}
                   </p>
                 </div>
               </div>

@@ -31,7 +31,7 @@ export default function ServicesAdmin() {
     if (!error) {
       setServices(services.filter(s => s.id !== id));
     } else {
-      alert('Error al eliminar: ' + error.message);
+      alert('Error deleting: ' + error.message);
     }
   }
 
@@ -39,12 +39,12 @@ export default function ServicesAdmin() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Servicios</h2>
-          <p className="text-zinc-400">Gestiona los servicios que ofreces en la web.</p>
+          <h2 className="text-3xl font-bold tracking-tight font-syne">Services</h2>
+          <p className="text-zinc-400 font-poppins">Manage the services offered on the website.</p>
         </div>
         <Link 
           href="/admin/services/new"
-          className="flex items-center space-x-2 bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-zinc-200 transition-colors"
+          className="flex items-center space-x-2 bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-zinc-200 transition-colors font-poppins"
         >
           <Plus size={20} />
           <span>New Service</span>
