@@ -137,11 +137,11 @@ export default function NewInvoicePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!formData.client_id) return alert('Seleccione un cliente')
+    if (!formData.client_id) return alert('Please select a client')
     setLoading(true)
 
     try {
-      // 1. Obtener siguiente número de factura vía RPC
+      // 1. Get next invoice number via RPC
       const series = isTest ? 'TEST' : 'NC'
       const { data: invoice_number, error: rpcError } = await supabase
         .rpc('get_next_invoice_number', { series_name: series })
@@ -186,7 +186,7 @@ export default function NewInvoicePage() {
 
       if (itemsError) throw itemsError
 
-      alert(`Factura ${invoice_number} creada exitosamente`)
+      alert(`Invoice ${invoice_number} created successfully`)
       window.location.href = '/admin/billing/invoices'
     } catch (error: any) {
       alert(error.message)

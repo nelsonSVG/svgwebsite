@@ -27,27 +27,27 @@ export default function AdminLogin() {
       router.push('/admin');
       router.refresh();
     } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión');
+      setError(err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4">
+    <div className="min-h-screen flex items-center justify-center bg-black px-4 font-poppins">
       <div className="max-w-md w-full space-y-8 p-8 bg-zinc-900 border border-zinc-800 rounded-2xl">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-white">
+          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-white font-syne">
             SVG Admin
           </h2>
           <p className="mt-2 text-center text-sm text-zinc-400">
-            Ingresa tus credenciales para administrar tu portafolio
+            Enter your credentials to manage your portfolio
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div className="mb-4">
-              <label htmlFor="email-address" className="sr-only">Correo electrónico</label>
+              <label htmlFor="email-address" className="sr-only">Email address</label>
               <input
                 id="email-address"
                 name="email"
@@ -61,7 +61,7 @@ export default function AdminLogin() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">Contraseña</label>
+              <label htmlFor="password" className="sr-only">Password</label>
               <input
                 id="password"
                 name="password"
@@ -71,7 +71,7 @@ export default function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-zinc-700 placeholder-zinc-500 text-white bg-zinc-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Contraseña"
+                placeholder="Password"
               />
             </div>
           </div>
@@ -86,9 +86,9 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-black bg-white hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white disabled:opacity-50 transition-colors"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-black bg-white hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white disabled:opacity-50 transition-colors font-bold"
             >
-              {loading ? 'Iniciando sesión...' : 'Entrar al panel'}
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </div>
         </form>

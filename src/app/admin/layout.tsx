@@ -122,13 +122,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             })}
           </nav>
 
-          <div className="p-4 border-t border-zinc-800">
+          <div className="p-4 border-t border-zinc-800 font-poppins">
             <button
               onClick={handleSignOut}
               className="flex items-center space-x-3 px-4 py-3 w-full text-zinc-400 hover:text-white transition-colors"
             >
               <LogOut size={20} />
-              <span>Cerrar Sesión</span>
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
