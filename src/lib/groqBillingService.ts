@@ -49,8 +49,8 @@ export async function generateGroqInvoiceItems(prompt: string) {
   
   try {
     // Limpiar posibles bloques de código markdown o texto extra
-    const startIndex = text.indexOf('[');
-    const endIndex = text.lastIndexOf(']');
+    const startIndex = text.indexOf('{');
+    const endIndex = text.lastIndexOf('}');
     
     if (startIndex !== -1 && endIndex !== -1) {
       return JSON.parse(text.substring(startIndex, endIndex + 1));
