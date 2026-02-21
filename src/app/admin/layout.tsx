@@ -14,7 +14,8 @@ import {
   Menu,
   X,
   Receipt,
-  UserCircle
+  UserCircle,
+  ExternalLink
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -98,8 +99,16 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex flex-col h-full">
-          <div className="p-6">
+          <div className="p-6 flex items-center justify-between">
             <h1 className="text-xl font-bold tracking-tighter font-syne">SVG ADMIN</h1>
+            <Link 
+              href="/" 
+              target="_blank" 
+              className="text-zinc-400 hover:text-white transition-colors p-1"
+              title="View Website"
+            >
+              <ExternalLink size={18} />
+            </Link>
           </div>
 
           <nav className="flex-1 px-4 space-y-2">
@@ -137,7 +146,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0">
         <header className="h-16 border-b border-zinc-800 flex items-center justify-between px-6 lg:hidden">
-          <h1 className="text-lg font-bold">SVG ADMIN</h1>
+          <div className="flex items-center space-x-3">
+            <h1 className="text-lg font-bold">SVG ADMIN</h1>
+            <Link 
+              href="/" 
+              target="_blank" 
+              className="text-zinc-400 hover:text-white transition-colors"
+              title="View Website"
+            >
+              <ExternalLink size={18} />
+            </Link>
+          </div>
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
             {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
