@@ -46,16 +46,16 @@ export async function generateGroqInvoiceItems(prompt: string) {
   });
 
   const text = completion.choices[0]?.message?.content || "";
-  
+
   try {
     // Limpiar posibles bloques de código markdown o texto extra
     const startIndex = text.indexOf('{');
     const endIndex = text.lastIndexOf('}');
-    
+
     if (startIndex !== -1 && endIndex !== -1) {
       return JSON.parse(text.substring(startIndex, endIndex + 1));
     }
-    
+
     return JSON.parse(text);
   } catch (error) {
     console.error("Error parsing Groq response:", text);
