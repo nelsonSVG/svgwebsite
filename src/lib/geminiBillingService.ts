@@ -1,9 +1,18 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyBfmXmfdvfxFEc-l2K781pDe8huo5UAuKA");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function generateGeminiInvoiceItems(prompt: string) {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured");
+  }
+
+  const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      generationConfig: {
+          responseMimeType: "application/json",
+      }
+  });
 
   const systemInstruction = `
     You are a professional billing assistant for SVG Visual Digital Design Agency. 
@@ -28,16 +37,7 @@ export async function generateGeminiInvoiceItems(prompt: string) {
   const text = response.text();
   
   try {
-    // Limpiar posibles bloques de código markdown
-    const jsonStr = text.replace(/```json/g, "").replace(/```/g, "").trim();
-    const startIndex = jsonStr.indexOf('[');
-    const endIndex = jsonStr.lastIndexOf(']');
-    
-    if (startIndex !== -1 && endIndex !== -1) {
-      return JSON.parse(jsonStr.substring(startIndex, endIndex + 1));
-    }
-    
-    return JSON.parse(jsonStr);
+    return JSON.parse(text);
   } catch (error) {
     console.error("Error parsing Gemini response:", text);
     throw new Error("No se pudo procesar la respuesta de la IA. Por favor intenta con un prompt más claro.");

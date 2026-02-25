@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Groq from 'groq-sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Resend } from 'resend';
 import { supabase } from '@/lib/supabaseClient';
 
@@ -11,19 +11,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    if (!process.env.GROQ_API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
         { text: "AI assistant is not configured. Please email hi@svgvisual.com directly." },
         { status: 200 }
       );
     }
 
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash",
+        generationConfig: {
+            responseMimeType: "application/json",
+        }
+    });
 
     // 1. Fetch Metadata (Attachments count)
     let attachmentContext = "";
-    let attachments: any[] = [];
     if (lead_id) {
         const { data: attData } = await supabase
             .from('attachments')
@@ -31,17 +35,18 @@ export async function POST(request: NextRequest) {
             .eq('lead_id', lead_id);
         
         if (attData && attData.length > 0) {
-            attachments = attData;
             attachmentContext = `\n[System Info: User has uploaded ${attData.length} reference files: ${attData.map(a => a.file_name).join(', ')}]`;
         }
     }
 
-    // 2. Live Chat Interaction with Llama 3.1 8B Instant
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: 'system',
-          content: `You are “SVG Project Consultant”, the strategic digital advisor for SVG Visual.
+    // 2. Prepare History for Gemini
+    // Gemini expects { role: 'user' | 'model', parts: [{ text: string }] }
+    const geminiHistory = history.map((msg: any) => ({
+        role: msg.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: msg.content }]
+    }));
+
+    const systemInstruction = `You are “SVG Project Consultant”, the strategic digital advisor for SVG Visual.
 You guide potential clients through a structured, premium qualification flow.
 You are not a chatbot. You are a business consultant.
 
@@ -79,7 +84,7 @@ PHASE 4 — Conversion Close: After Full Name, Brand Name, Contact Info, and at 
 CRITICAL INTERACTION RULE: If user selects something like “Share your website goals”, You MUST ask: "What are your website goals?" With "suggestions": [] Then STOP and wait. Never continue answering on their behalf.
 
 STRICT OUTPUT FORMAT:
-Always respond ONLY in:
+Always respond ONLY in JSON:
 {
 "text": "Message to the user",
 "suggestions": [],
@@ -88,117 +93,30 @@ Always respond ONLY in:
 When Name + Brand + Contact collected: Set "lead_status": "complete"
 
 Tone: Professional. Strategic. Concise. High-value.
-${attachmentContext}`,
-        },
-        ...history,
-        { role: 'user', content: message },
-      ],
-      model: 'llama-3.1-8b-instant',
-      response_format: { type: 'json_object' },
-      temperature: 0.7,
-      max_tokens: 1024,
+${attachmentContext}`;
+
+    // 3. Start Chat with System Instruction
+    const chat = model.startChat({
+        history: geminiHistory,
     });
 
-    const responseText = chatCompletion.choices[0]?.message?.content || "";
-    let parsedResponse: any;
-    
+    const result = await chat.sendMessage(systemInstruction + "\n\nUser Message: " + message);
+    const responseText = result.response.text();
+
     try {
-      parsedResponse = JSON.parse(responseText);
-    } catch (e) {
-      parsedResponse = {
-        text: responseText,
-        suggestions: [],
-        lead_status: "in_progress"
-      };
-    }
-
-    // 3. Premium Brief Generation with GPT-OSS-20B if Lead is Complete
-    if (parsedResponse.lead_status === 'complete' && lead_id) {
-      try {
-        const fullHistoryForSummary = [
-          ...history,
-          { role: 'user', content: message },
-          { role: 'assistant', content: responseText }
-        ].map(m => `${m.role}: ${m.content || m.text}`).join('\n');
-
-        const summaryCompletion = await groq.chat.completions.create({
-          messages: [
-            {
-              role: 'system',
-              content: `You are a Senior Business Analyst for SVG Visual.
-You receive a full conversation between SVG Project Consultant and a potential client.
-Your role is to generate an executive-level project brief for internal use.
-
-ANALYSIS RULES: Extract ONLY information explicitly stated. Do NOT fabricate missing data. If missing, write: Not provided. Be analytical and structured. No conversational tone. No assumptions.
-
-OUTPUT FORMAT (MANDATORY): Use clean Markdown.
-Include sections: Client Name, Brand / Project Name, Contact Information, Requested Service, Project Type, Primary Objective, Secondary Objectives, Project Scope Summary, Discovery Insights, Current Assets Provided, Timeline Indicators, Budget Indicators, Lead Completeness Level, Strategic Opportunities, Risk Factors, Lead Potential Score, Recommended Internal Action.
-
-GOAL: Deliver a concise, decision-ready summary for SVG Visual to prioritize leads. Executive clarity only.`
-            },
-            { role: 'user', content: `Analyze this conversation:\n\n${fullHistoryForSummary}\n\nAttachments provided: ${attachments.length > 0 ? attachments.map(a => a.file_name).join(', ') : 'None'}` }
-          ],
-          model: 'openai/gpt-oss-20b',
-          temperature: 0.1
+        const jsonResponse = JSON.parse(responseText);
+        return NextResponse.json(jsonResponse);
+    } catch (parseError) {
+        console.error("Gemini JSON Parse Error:", parseError, responseText);
+        return NextResponse.json({
+            text: responseText,
+            suggestions: [],
+            lead_status: "in_progress"
         });
-
-        const premiumBrief = summaryCompletion.choices[0]?.message?.content || "";
-
-        // 4. Update Lead in Database
-        await supabase
-          .from('leads')
-          .update({
-            full_name: parsedResponse.text.match(/name is ([^,.]+)/i)?.[1] || null, // Best effort extraction
-            summary_brief: premiumBrief,
-            lead_status: 'qualified'
-          })
-          .eq('id', lead_id);
-
-        // 5. Send Email
-        if (premiumBrief) {
-          await resend.emails.send({
-            from: 'SVG Project Consultant <onboarding@resend.dev>',
-            to: 'hi@svgvisual.com',
-            subject: `🔥 NEW QUALIFIED LEAD: ${lead_id.substring(0,8)}`,
-            html: `<div style="font-family: 'Inter', sans-serif; line-height: 1.6; color: #1a1a1a; max-width: 600px; margin: auto;">
-                    <div style="background: #000; color: #fff; padding: 30px; border-radius: 12px 12px 0 0;">
-                      <h1 style="margin: 0; font-size: 24px;">SVG Visual</h1>
-                      <p style="margin: 10px 0 0 0; opacity: 0.7; font-size: 14px;">Premium Project Brief</p>
-                    </div>
-                    <div style="background: #ffffff; padding: 40px; border: 1px solid #eaeaea; border-radius: 0 0 12px 12px;">
-                      ${premiumBrief.split('\n').map(line => {
-                        if (line.startsWith('#')) return `<h3 style="margin-top: 25px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px;">${line.replace(/#/g, '').trim()}</h3>`;
-                        if (line.includes(':')) {
-                            const [title, ...rest] = line.split(':');
-                            return `<p style="margin: 12px 0;"><strong>${title.replace(/[*_]/g, '').trim()}:</strong> ${rest.join(':').trim()}</p>`;
-                        }
-                        return `<p style="margin: 8px 0;">${line.trim()}</p>`;
-                      }).join('')}
-                      
-                      ${attachments.length > 0 ? `
-                        <h3 style="margin-top: 25px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px;">Attachments</h3>
-                        <ul style="padding-left: 20px;">
-                          ${attachments.map(a => `<li><a href="${a.storage_url}" target="_blank">${a.file_name}</a></li>`).join('')}
-                        </ul>
-                      ` : ''}
-                    </div>
-                    <p style="text-align: center; color: #999; font-size: 12px; margin-top: 30px;">
-                      Executive Summary for Lead ${lead_id}
-                    </p>
-                  </div>`
-          });
-        }
-      } catch (summaryError) {
-        console.error('Failed to generate premium brief or send email:', summaryError);
-      }
     }
 
-    return NextResponse.json({ text: responseText });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Chat API Error:', error);
-    return NextResponse.json(
-      { text: JSON.stringify({ text: "Connection interrupted. Please email hi@svgvisual.com directly.", suggestions: [], lead_status: "in_progress" }) },
-      { status: 200 }
-    );
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
