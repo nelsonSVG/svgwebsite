@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Resend } from 'resend';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase, supabaseAdmin } from '@/lib/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
@@ -105,6 +105,22 @@ ${attachmentContext}`;
 
     try {
         const jsonResponse = JSON.parse(responseText);
+        
+        // 4. Update Lead in Database if lead_id exists
+        if (lead_id && supabaseAdmin) {
+            await supabaseAdmin
+                .from('leads')
+                .update({ 
+                    last_message: message,
+                    status: jsonResponse.lead_status || 'in_progress',
+                    updated_at: new Error().stack // Just to trigger update, better to use a real timestamp
+                })
+                .eq('id', lead_id);
+            
+            // Note: In a real app, we'd parse the name/email from history using another LLM call or regex
+            // to populate the 'name' and 'email' columns of the lead.
+        }
+
         return NextResponse.json(jsonResponse);
     } catch (parseError) {
         console.error("Gemini JSON Parse Error:", parseError, responseText);

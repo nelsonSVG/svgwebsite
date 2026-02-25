@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase, supabaseAdmin } from '@/lib/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,11 +11,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File and lead_id are required' }, { status: 400 });
     }
 
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Database admin client not configured' }, { status: 500 });
+    }
+
     // 1. Upload to Supabase Storage
     const fileExt = file.name.split('.').pop();
     const fileName = `${leadId}/${Math.random()}.${fileExt}`;
     const filePath = `${fileName}`;
 
+    // Note: Storage might also need specific policies, 
+    // but usually, it's public for uploads if configured that way.
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('project-assets')
       .upload(filePath, file);
@@ -27,8 +33,8 @@ export async function POST(request: NextRequest) {
       .from('project-assets')
       .getPublicUrl(filePath);
 
-    // 3. Save metadata to Database
-    const { error: dbError } = await supabase
+    // 3. Save metadata to Database (Using supabaseAdmin to bypass RLS)
+    const { error: dbError } = await supabaseAdmin
       .from('attachments')
       .insert([
         {
