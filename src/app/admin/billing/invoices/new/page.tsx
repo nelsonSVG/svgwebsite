@@ -33,7 +33,7 @@ export default function NewInvoicePage() {
   }, [])
 
   async function fetchClients() {
-    const { data } = await supabase.schema('billing').from('clients').select('*').order('name')
+    const { data } = await supabase.from('clients').select('*').order('name')
     setClients(data || [])
   }
 
@@ -78,13 +78,12 @@ export default function NewInvoicePage() {
         
         if (data.client && data.client.name) {
           // Intentar buscar si el cliente ya existe
-          const { data: existingClient } = await supabase
-            .schema('billing')
-            .from('clients')
-            .select('id')
-            .ilike('name', `%${data.client.name}%`)
-            .limit(1)
-            .single()
+        const { data: existingClient } = await supabase
+          .from('clients')
+          .select('id')
+          .ilike('name', `%${data.client.name}%`)
+          .limit(1)
+          .single()
 
           if (existingClient) {
             setFormData(prev => ({ ...prev, client_id: existingClient.id }))
@@ -110,7 +109,6 @@ export default function NewInvoicePage() {
     setLoading(true)
     try {
       const { data, error } = await supabase
-        .schema('billing')
         .from('clients')
         .insert([{
           name: suggestedClient.name,
@@ -150,7 +148,6 @@ export default function NewInvoicePage() {
 
       // 2. Crear factura
       const { data: invoice, error: invError } = await supabase
-        .schema('billing')
         .from('invoices')
         .insert([{
           invoice_number,
@@ -180,7 +177,6 @@ export default function NewInvoicePage() {
       }))
 
       const { error: itemsError } = await supabase
-        .schema('billing')
         .from('invoice_items')
         .insert(itemsToInsert)
 

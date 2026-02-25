@@ -198,3 +198,11 @@ BEGIN
     DROP POLICY IF EXISTS "Admins have full access" ON public.audit_log;
     CREATE POLICY "Admins have full access" ON public.audit_log FOR ALL TO authenticated USING (auth.role() = 'authenticated');
 END $$;
+
+-- Política pública para ver facturas por número (requerido para clientes)
+DROP POLICY IF EXISTS "Public can view invoice by number" ON public.invoices;
+CREATE POLICY "Public can view invoice by number" ON public.invoices FOR SELECT TO anon, authenticated USING (true);
+
+-- Política pública para ver items de factura (requerido para visualización pública)
+DROP POLICY IF EXISTS "Public can view invoice items" ON public.invoice_items;
+CREATE POLICY "Public can view invoice items" ON public.invoice_items FOR SELECT TO anon, authenticated USING (true);

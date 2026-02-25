@@ -18,8 +18,7 @@ export const supabase = createClient(
   }
 );
 
-// Note: To use the 'billing' schema, you should use: supabase.schema('billing').from(...)
-// This client is configured to allow multiple schemas if they are exposed in Supabase settings.
+// Note: All billing tables are now in the 'public' schema to simplify configuration.
 
 export const supabaseAdmin = supabaseServiceKey 
   ? createClient(supabaseUrl!, supabaseServiceKey, {

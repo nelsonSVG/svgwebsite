@@ -26,7 +26,6 @@ export default function ClientsPage() {
   async function fetchClients() {
     setLoading(true)
     const { data, error } = await supabase
-      .schema('billing')
       .from('clients')
       .select('*')
       .order('created_at', { ascending: false })
@@ -43,35 +42,46 @@ export default function ClientsPage() {
     e.preventDefault()
     setLoading(true)
 
-    if (editingClient) {
-      const { error } = await supabase
-        .schema('billing')
-        .from('clients')
-        .update(formData)
-        .eq('id', editingClient.id)
-      
-      if (error) alert(error.message)
-    } else {
-      const { error } = await supabase
-        .schema('billing')
-        .from('clients')
-        .insert([formData])
-      
-      if (error) alert(error.message)
-    }
+    try {
+      if (editingClient) {
+        const { error } = await supabase
+          .from('clients')
+          .update(formData)
+          .eq('id', editingClient.id)
+        
+        if (error) {
+          console.error('Error updating client:', error)
+          alert(`Error: ${error.message}\nDetails: ${JSON.stringify(error, null, 2)}`)
+          return
+        }
+      } else {
+        const { error } = await supabase
+          .from('clients')
+          .insert([formData])
+        
+        if (error) {
+          console.error('Error inserting client:', error)
+          alert(`Error: ${error.message}\nDetails: ${JSON.stringify(error, null, 2)}`)
+          return
+        }
+      }
 
-    setIsModalOpen(false)
-    setEditingClient(null)
-    setFormData({
-      name: '',
-      email: '',
-      company_name: '',
-      tax_id: '',
-      address: '',
-      language_preference: 'en',
-      payment_preference: 'card'
-    })
-    fetchClients()
+      setIsModalOpen(false)
+      setEditingClient(null)
+      setFormData({
+        name: '',
+        email: '',
+        company_name: '',
+        tax_id: '',
+        address: '',
+        language_preference: 'en',
+        payment_preference: 'card'
+      })
+      fetchClients()
+    } catch (err) {
+      console.error('Unexpected error:', err)
+      alert(`Unexpected error: ${err}`)
+    }
   }
 
   function handleEdit(client: Client) {

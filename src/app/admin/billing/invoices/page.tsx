@@ -16,7 +16,6 @@ export default function InvoicesPage() {
   async function fetchInvoices() {
     setLoading(true)
     const { data, error } = await supabase
-      .schema('billing')
       .from('invoices')
       .select(`
         *,

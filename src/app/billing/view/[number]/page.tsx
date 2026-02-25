@@ -14,7 +14,6 @@ export default function PublicInvoicePage({ params }: { params: Promise<{ number
   useEffect(() => {
     async function fetchInvoice() {
       const { data, error } = await supabase
-        .schema('billing')
         .from('invoices')
         .select(`
           *,

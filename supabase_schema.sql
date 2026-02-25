@@ -41,6 +41,7 @@ end;
 $$ language plpgsql
 set search_path = public;
 
+drop trigger if exists update_leads_updated_at on leads;
 create trigger update_leads_updated_at
     before update on leads
     for each row
@@ -62,14 +63,22 @@ alter table public.leads enable row level security;
 alter table public.attachments enable row level security;
 alter table public.instagram_config enable row level security;
 
--- Policies for Leads & Attachments
+-- Policies for Leads
+drop policy if exists "Allow public insert on leads" on public.leads;
 create policy "Allow public insert on leads" on public.leads for insert with check (true);
+
+drop policy if exists "Allow admin full access on leads" on public.leads;
 create policy "Allow admin full access on leads" on public.leads for all to authenticated using (auth.role() = 'authenticated');
 
+-- Policies for Attachments
+drop policy if exists "Allow public insert on attachments" on public.attachments;
 create policy "Allow public insert on attachments" on public.attachments for insert with check (true);
+
+drop policy if exists "Allow admin full access on attachments" on public.attachments;
 create policy "Allow admin full access on attachments" on public.attachments for all to authenticated using (auth.role() = 'authenticated');
 
 -- Policies for Instagram Config
+drop policy if exists "Allow admin full access on instagram_config" on public.instagram_config;
 create policy "Allow admin full access on instagram_config" on public.instagram_config for all to authenticated using (auth.role() = 'authenticated');
 
 -- Insertar token inicial

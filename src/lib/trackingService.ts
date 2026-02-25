@@ -2,7 +2,6 @@ import { supabase } from '@/lib/supabaseClient';
 
 export async function logInvoiceEvent(invoiceId: string, eventType: string, metadata: any = {}) {
   const { error } = await supabase
-    .schema('billing')
     .from('invoice_events')
     .insert([{
       invoice_id: invoiceId,
@@ -19,7 +18,6 @@ export async function logInvoiceEvent(invoiceId: string, eventType: string, meta
 export async function logAuditAction(action: string, invoiceId: string, details: any = {}) {
   // En una aplicación real, obtendríamos el user_id de la sesión
   const { error } = await supabase
-    .schema('billing')
     .from('audit_log')
     .insert([{
       action,
