@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Groq from 'groq-sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,30 +9,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 });
     }
 
-    if (!process.env.GROQ_API_KEY) {
-      return NextResponse.json({ error: 'Groq API Key not configured' }, { status: 500 });
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json({ error: 'Gemini API Key not configured' }, { status: 500 });
     }
 
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: 'system',
-          content: `You are a professional translator for a high-end digital design agency called SVG Visual.
+    const systemInstruction = `You are a professional translator for a high-end digital design agency called SVG Visual.
 Translate the following English text to professional, elegant, and modern Spanish.
 The tone should be sophisticated and boutique-style.
 Context: ${context}
 
-Respond ONLY with the translated text, no explanations, no quotes.`
-        },
-        { role: 'user', content: text },
-      ],
-      model: 'llama-3.1-8b-instant',
-      temperature: 0.3,
-    });
+Respond ONLY with the translated text, no explanations, no quotes.`;
 
-    const translatedText = completion.choices[0]?.message?.content || "";
+    const result = await model.generateContent([systemInstruction, text]);
+    const translatedText = result.response.text();
 
     return NextResponse.json({ translation: translatedText.trim() });
   } catch (error: any) {
