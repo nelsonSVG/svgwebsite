@@ -38,7 +38,8 @@ begin
     new.updated_at = now();
     return new;
 end;
-$$ language plpgsql;
+$$ language plpgsql
+set search_path = public;
 
 create trigger update_leads_updated_at
     before update on leads
@@ -55,6 +56,21 @@ create table if not exists public.instagram_config (
     updated_at timestamp with time zone default now(),
     expires_at timestamp with time zone
 );
+
+-- Security Improvements
+alter table public.leads enable row level security;
+alter table public.attachments enable row level security;
+alter table public.instagram_config enable row level security;
+
+-- Policies for Leads & Attachments
+create policy "Allow public insert on leads" on public.leads for insert with check (true);
+create policy "Allow admin full access on leads" on public.leads for all to authenticated using (auth.role() = 'authenticated');
+
+create policy "Allow public insert on attachments" on public.attachments for insert with check (true);
+create policy "Allow admin full access on attachments" on public.attachments for all to authenticated using (auth.role() = 'authenticated');
+
+-- Policies for Instagram Config
+create policy "Allow admin full access on instagram_config" on public.instagram_config for all to authenticated using (auth.role() = 'authenticated');
 
 -- Insertar token inicial
 -- Nota: En un entorno real, esto se manejaría desde el panel de administración o una migración controlada.

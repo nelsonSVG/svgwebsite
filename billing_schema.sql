@@ -1,8 +1,7 @@
--- Esquema para facturación
-CREATE SCHEMA IF NOT EXISTS billing;
+-- Esquema para facturación (ahora en public para evitar problemas de configuración de esquemas en Supabase)
 
 -- Tabla de secuencias de numeración
-CREATE TABLE IF NOT EXISTS billing.invoice_sequences (
+CREATE TABLE IF NOT EXISTS public.invoice_sequences (
   series_name TEXT PRIMARY KEY,
   next_number INTEGER NOT NULL,
   prefix TEXT NOT NULL,
@@ -10,12 +9,12 @@ CREATE TABLE IF NOT EXISTS billing.invoice_sequences (
 );
 
 -- Inicializar con continuación del sistema anterior (empezando en NC-006)
-INSERT INTO billing.invoice_sequences (series_name, next_number, prefix)
+INSERT INTO public.invoice_sequences (series_name, next_number, prefix)
 VALUES ('NC', 6, 'NC'), ('TEST', 1, 'TEST')
 ON CONFLICT (series_name) DO UPDATE SET next_number = EXCLUDED.next_number, prefix = EXCLUDED.prefix;
 
 -- Clientes
-CREATE TABLE IF NOT EXISTS billing.clients (
+CREATE TABLE IF NOT EXISTS public.clients (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   email TEXT NOT NULL,
@@ -36,10 +35,10 @@ BEGIN
 END$$;
 
 -- Facturas
-CREATE TABLE IF NOT EXISTS billing.invoices (
+CREATE TABLE IF NOT EXISTS public.invoices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   invoice_number TEXT UNIQUE NOT NULL,
-  client_id UUID REFERENCES billing.clients(id),
+  client_id UUID REFERENCES public.clients(id),
   status invoice_status DEFAULT 'draft',
   
   -- Montos
@@ -79,9 +78,9 @@ CREATE TABLE IF NOT EXISTS billing.invoices (
 );
 
 -- Items de factura
-CREATE TABLE IF NOT EXISTS billing.invoice_items (
+CREATE TABLE IF NOT EXISTS public.invoice_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  invoice_id UUID REFERENCES billing.invoices(id) ON DELETE CASCADE,
+  invoice_id UUID REFERENCES public.invoices(id) ON DELETE CASCADE,
   description TEXT NOT NULL,
   quantity INTEGER DEFAULT 1,
   unit_price NUMERIC NOT NULL,
@@ -90,9 +89,9 @@ CREATE TABLE IF NOT EXISTS billing.invoice_items (
 );
 
 -- Eventos de tracking (analíticas)
-CREATE TABLE IF NOT EXISTS billing.invoice_events (
+CREATE TABLE IF NOT EXISTS public.invoice_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  invoice_id UUID REFERENCES billing.invoices(id),
+  invoice_id UUID REFERENCES public.invoices(id),
   event_type TEXT NOT NULL, -- 'email_opened', 'viewed', 'paid_button_clicked', 'pdf_downloaded'
   occurred_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   metadata JSONB DEFAULT '{}', -- IP, user_agent, country, etc.
@@ -100,7 +99,7 @@ CREATE TABLE IF NOT EXISTS billing.invoice_events (
 );
 
 -- Facturas migradas (sistema anterior, solo lectura)
-CREATE TABLE IF NOT EXISTS billing.migrated_invoices (
+CREATE TABLE IF NOT EXISTS public.migrated_invoices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   invoice_number TEXT UNIQUE NOT NULL,
   client_name TEXT,
@@ -115,7 +114,7 @@ CREATE TABLE IF NOT EXISTS billing.migrated_invoices (
 );
 
 -- Auditoría (quién hizo qué)
-CREATE TABLE IF NOT EXISTS billing.audit_log (
+CREATE TABLE IF NOT EXISTS public.audit_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID,
   action TEXT NOT NULL, -- 'created', 'updated', 'voided', 'paid'
@@ -131,11 +130,12 @@ BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = public;
 
-DROP TRIGGER IF EXISTS update_invoices_updated_at ON billing.invoices;
+DROP TRIGGER IF EXISTS update_invoices_updated_at ON public.invoices;
 CREATE TRIGGER update_invoices_updated_at
-    BEFORE UPDATE ON billing.invoices
+    BEFORE UPDATE ON public.invoices
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
@@ -147,7 +147,7 @@ DECLARE
   pfx TEXT;
 BEGIN
   SELECT next_number, prefix INTO next_num, pfx
-  FROM billing.invoice_sequences
+  FROM public.invoice_sequences
   WHERE series_name = $1
   FOR UPDATE;
   
@@ -155,30 +155,46 @@ BEGIN
     RAISE EXCEPTION 'Series % not found', series_name;
   END IF;
 
-  UPDATE billing.invoice_sequences
+  UPDATE public.invoice_sequences
   SET next_number = next_number + 1,
       updated_at = NOW()
   WHERE series_name = $1;
   
   RETURN pfx || '-' || LPAD(next_num::TEXT, 3, '0');
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public;
 
 -- Habilitar RLS
-ALTER TABLE billing.invoice_sequences ENABLE ROW LEVEL SECURITY;
-ALTER TABLE billing.clients ENABLE ROW LEVEL SECURITY;
-ALTER TABLE billing.invoices ENABLE ROW LEVEL SECURITY;
-ALTER TABLE billing.invoice_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE billing.invoice_events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE billing.migrated_invoices ENABLE ROW LEVEL SECURITY;
-ALTER TABLE billing.audit_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.invoice_sequences ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.invoice_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.invoice_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.migrated_invoices ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_log ENABLE ROW LEVEL SECURITY;
 
--- Políticas básicas (solo admin puede ver/editar por ahora)
--- Nota: Esto asume que hay un sistema de roles o que el usuario autenticado es admin
-CREATE POLICY "Admins have full access" ON billing.invoice_sequences FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admins have full access" ON billing.clients FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admins have full access" ON billing.invoices FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admins have full access" ON billing.invoice_items FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admins have full access" ON billing.invoice_events FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admins have full access" ON billing.migrated_invoices FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admins have full access" ON billing.audit_log FOR ALL TO authenticated USING (true);
+-- Políticas básicas (usando DROP POLICY IF EXISTS para evitar errores al re-ejecutar)
+DO $$
+BEGIN
+    DROP POLICY IF EXISTS "Admins have full access" ON public.invoice_sequences;
+    CREATE POLICY "Admins have full access" ON public.invoice_sequences FOR ALL TO authenticated USING (auth.role() = 'authenticated');
+
+    DROP POLICY IF EXISTS "Admins have full access" ON public.clients;
+    CREATE POLICY "Admins have full access" ON public.clients FOR ALL TO authenticated USING (auth.role() = 'authenticated');
+
+    DROP POLICY IF EXISTS "Admins have full access" ON public.invoices;
+    CREATE POLICY "Admins have full access" ON public.invoices FOR ALL TO authenticated USING (auth.role() = 'authenticated');
+
+    DROP POLICY IF EXISTS "Admins have full access" ON public.invoice_items;
+    CREATE POLICY "Admins have full access" ON public.invoice_items FOR ALL TO authenticated USING (auth.role() = 'authenticated');
+
+    DROP POLICY IF EXISTS "Admins have full access" ON public.invoice_events;
+    CREATE POLICY "Admins have full access" ON public.invoice_events FOR ALL TO authenticated USING (auth.role() = 'authenticated');
+
+    DROP POLICY IF EXISTS "Admins have full access" ON public.migrated_invoices;
+    CREATE POLICY "Admins have full access" ON public.migrated_invoices FOR ALL TO authenticated USING (auth.role() = 'authenticated');
+
+    DROP POLICY IF EXISTS "Admins have full access" ON public.audit_log;
+    CREATE POLICY "Admins have full access" ON public.audit_log FOR ALL TO authenticated USING (auth.role() = 'authenticated');
+END $$;
